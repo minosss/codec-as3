@@ -4,12 +4,8 @@
  * Date: 14/12/15 10:43
  */
 package cc.minos.codec.mp4.boxs {
+
     import cc.minos.codec.mp4.MP4Constants;
-
-    import com.hurlant.util.Hex;
-
-    import com.hurlant.util.Hex;
-
     import flash.utils.ByteArray;
 
     public class StsdBox extends Box {
@@ -39,7 +35,7 @@ package cc.minos.codec.mp4.boxs {
             trace('size: ' + data.readUnsignedInt());
             //type
             var codecType:uint = data.readUnsignedInt();
-            trace('type: ' + Hex.toString(codecType.toString(16)));
+            trace('type: ' + Box.toString(codecType.toString(16)));
 
             _configurationData = new ByteArray();
             var offset:uint;
@@ -86,7 +82,7 @@ package cc.minos.codec.mp4.boxs {
                 //size
                 trace('size: ' + data.readUnsignedInt());
                 //type
-                trace('type: ' + Hex.toString(data.readUnsignedInt().toString(16)));
+                trace('type: ' + Box.toString(data.readUnsignedInt().toString(16)));
                 offset = data.position;
                 trace('version: ' + data.readByte());
                 trace('profile: ' + data.readUnsignedByte());
@@ -135,7 +131,7 @@ package cc.minos.codec.mp4.boxs {
                 //size
                 data.readUnsignedInt();
                 //type
-                trace( 'type: ' + Hex.toString(data.readUnsignedInt().toString(16)) );
+                trace( 'type: ' + Box.toString(data.readUnsignedInt().toString(16)) );
 
                 //0x03 0x04 0x05
                 while( data.bytesAvailable > 0 )
