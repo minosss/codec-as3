@@ -30,7 +30,6 @@ package cc.minos.codec.mp4.boxs {
         protected var _duration:Number = 0.0;
         protected var _audioSamples:Vector.<Sample>;
 
-        private const __type:uint = 0x663476;
         private var _audioChannels:uint;
         private var _audioRate:Number;
         private var _audioSize:uint;
@@ -40,7 +39,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function F4vBox()
         {
-            super(__type);
+            super(0x528801);
         }
 
         override protected function decode():void

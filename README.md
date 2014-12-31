@@ -9,7 +9,8 @@ CODEC-AS3
 *  [FLV](http://www.adobe.com/content/dam/Adobe/en/devnet/flv/pdfs/video_file_format_spec_v10.pdf)
 *  [MKV](http://www.matroska.org/files/matroska.pdf)
 
-###Usage
+##USAGE
+=======
 ```as3
 var mp4:Mp4Codec = new Mp4Codec();
 mp4.decode(mp4bytes);
