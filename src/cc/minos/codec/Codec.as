@@ -13,15 +13,20 @@ package cc.minos.codec {
         protected var _rawData:ByteArray = null;;
 
         protected var _frames:Vector.<IFrame> = new Vector.<IFrame>();
-        protected var _hasVideo:Boolean = false;
-        protected var _hasAudio:Boolean = false;
-        protected var _videoConfig:ByteArray = null; //sps & pps
-        protected var _audioConfig:ByteArray = null; //sound spec
+        protected var _keyframes:Vector.<uint> = null;
 
-        protected var _videoRate:Number = 0.0;
+        protected var _hasVideo:Boolean = false;
+        protected var _videoConfig:ByteArray = null; //sps & pps
+        protected var _videoCodec:uint;
         protected var _videoWidth:Number = 0.0;
         protected var _videoHeight:Number = 0.0;
+        protected var _videoRate:Number;
 
+        protected var _frameRate:Number = 0.0; //fps
+
+        protected var _hasAudio:Boolean = false;
+        protected var _audioConfig:ByteArray = null; //audio specs
+        protected var _audioCodec:uint;
         protected var _audioType:uint = 10;
         protected var _audioRate:Number = 44100;
         protected var _audioSize:Number = 16;
@@ -35,49 +40,66 @@ package cc.minos.codec {
             this._type = type;
         }
 
-        protected static function writeUI24(stream:*, p:uint):void
+        /* byte handlers */
+
+        protected function byte_r8(s:*):int
         {
-            var byte1:int = p >> 16;
-            var byte2:int = p >> 8 & 0xff;
-            var byte3:int = p & 0xff;
-            stream.writeByte(byte1);
-            stream.writeByte(byte2);
-            stream.writeByte(byte3);
+            if( s.position < s.length )
+                return s.readByte();
+            return 0;
         }
 
-        protected static function writeUI16(stream:*, p:uint):void
+        protected function byte_rb16(s:*):uint
         {
-            stream.writeByte( p >> 8 )
-            stream.writeByte( p & 0xff );
+            var val:uint;
+            val = byte_r8(s) << 8;
+            val |= byte_r8(s);
+            return val;
         }
 
-        protected static function writeUI4_12(stream:*, p1:uint, p2:uint):void
+        protected function byte_rb24(s:*):uint
         {
-            // writes a 4-bit value followed by a 12-bit value in a total of 2 bytes
-
-            var byte1a:int = p1 << 4;
-            var byte1b:int = p2 >> 8;
-            var byte1:int = byte1a + byte1b;
-            var byte2:int = p2 & 0xff;
-
-            stream.writeByte(byte1);
-            stream.writeByte(byte2);
+            var val:uint;
+            val = byte_rb16(s) << 8;
+            val |= byte_r8(s);
+            return val;
         }
 
-        public function get type():String
+        protected function byte_rb32(s:*):uint
         {
-            return _type;
+            var val:uint;
+            val = byte_rb16(s) << 16;
+            val |= byte_rb16(s);
+            return val;
         }
 
-        public function get hasVideo():Boolean
+        protected function byte_w8(s:*, b:int):void
         {
-            return false;
+            if( b >= -128 && b <= 255 )
+                s.writeByte(b);
         }
 
-        public function get hasAudio():Boolean
+        protected function byte_wb16(s:*, b:uint):void
         {
-            return false;
+            byte_w8(s, b >> 8 )
+            byte_w8(s, b & 0xff );
         }
+
+        protected function byte_wb24(s:*, b:uint):void
+        {
+            byte_wb16(s, b >> 8 );
+            byte_w8(s, b & 0xff );
+        }
+
+        protected function byte_wb32(s:*, b:uint):void
+        {
+            byte_w8(s, b >> 24 );
+            byte_w8(s, b >> 16 & 0xff );
+            byte_w8(s, b >> 8 & 0xff );
+            byte_w8(s, b & 0xff );
+        }
+
+        /* byte handlers end */
 
         public function decode(input:ByteArray):ICodec
         {
@@ -111,9 +133,28 @@ package cc.minos.codec {
             return null;
         }
 
+        public function get type():String
+        {
+            return _type;
+        }
+
+        public function get hasVideo():Boolean
+        {
+            return _hasVideo;
+        }
+
+        public function get hasAudio():Boolean
+        {
+            return _hasAudio;
+        }
+
         public function get frames():Vector.<IFrame>
         {
             return _frames;
+        }
+
+        public function get keyframes():Vector.<uint> {
+            return _keyframes;
         }
 
         public function get duration():Number
@@ -121,14 +162,9 @@ package cc.minos.codec {
             return _duration;
         }
 
-        public function set hasVideo(value:Boolean):void
+        public function get frameRate():Number
         {
-            _hasVideo = value;
-        }
-
-        public function set hasAudio(value:Boolean):void
-        {
-            _hasAudio = value;
+            return _frameRate;
         }
 
         public function get videoConfig():ByteArray
@@ -136,14 +172,9 @@ package cc.minos.codec {
             return _videoConfig;
         }
 
-        public function get audioConfig():ByteArray
+        public function get videoCodec():uint
         {
-            return _audioConfig;
-        }
-
-        public function get videoRate():Number
-        {
-            return _videoRate;
+            return _videoCodec;
         }
 
         public function get videoWidth():Number
@@ -155,5 +186,41 @@ package cc.minos.codec {
         {
             return _videoHeight;
         }
+
+        public function get videoRate():Number
+        {
+            return _videoRate;
+        }
+
+        public function get audioConfig():ByteArray
+        {
+            return _audioConfig;
+        }
+
+        public function get audioCodec():uint
+        {
+            return _audioCodec;
+        }
+
+        public function get audioType():uint
+        {
+            return _audioType;
+        }
+
+        public function get audioRate():Number
+        {
+            return  _audioRate;
+        }
+
+        public function get audioSize():Number
+        {
+            return _audioSize;
+        }
+
+        public function get audioChannels():uint
+        {
+            return _audioChannels;
+        }
+
     }
 }

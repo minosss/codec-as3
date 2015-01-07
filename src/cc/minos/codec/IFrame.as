@@ -15,6 +15,9 @@ package cc.minos.codec {
         function get frameType():uint;
         function set frameType(value:uint):void;
 
+        function get codecId():uint;
+        function set codecId(value:uint):void;
+
         function get size():uint;
         function set size(value:uint):void;
 

@@ -5,6 +5,7 @@
  */
 package cc.minos.codec.mp4.boxs {
 
+    import cc.minos.codec.flv.FLVConstants;
     import cc.minos.codec.mp4.MP4Constants;
     import cc.minos.codec.mp4.Sample;
 
@@ -19,6 +20,7 @@ package cc.minos.codec.mp4.boxs {
 
         private var _stsdBox:StsdBox;
         private var _sttsBox:SttsBox;
+        private var _stssBox:StssBox;
 
         public function StblBox()
         {
@@ -27,8 +29,6 @@ package cc.minos.codec.mp4.boxs {
 
         override protected function init():void
         {
-
-            trace('stbl ===============');
 
             //stts
             _sttsBox = getBox(MP4Constants.BOX_TYPE_STTS).shift() as SttsBox;
@@ -65,12 +65,12 @@ package cc.minos.codec.mp4.boxs {
             var keyframes:Vector.<uint>;
             try
             {
-                var stssBox:StssBox = getBox(MP4Constants.BOX_TYPE_STSS).shift() as StssBox;
-                keyframes = stssBox.keyframes;
+                _stssBox = getBox(MP4Constants.BOX_TYPE_STSS).shift() as StssBox;
+                keyframes = _stssBox.keyframes;
                 hasKey = true;
             }catch(er:Error)
             {
-                trace('no key frame');
+                trace('[STBL-BOX] Not found key frames!');
                 trace(er.message);
                 hasKey = false;
             }
@@ -111,6 +111,8 @@ package cc.minos.codec.mp4.boxs {
                     {
                         s.dataType = 0x09;
                         s.frameType = (keyframes.indexOf(samIndex) != -1) ? 1 : 2;
+//                        FLVConstants.VIDEO_FRAME_KEY;
+//                        FLVConstants.VIDEO_FRAME_INTER;
                     }else{
                         s.dataType = 0x08;
                     }
@@ -121,8 +123,8 @@ package cc.minos.codec.mp4.boxs {
                 }
             }
 
-            trace('chunk: ' + chunk.length );
-            trace('samples: ' + samples.length );
+            trace('[STBL-BOX] chunk: ' + chunk.length );
+            trace('[STBL-BOX] samples: ' + samples.length );
 
             /*for (var j:uint in keyframes)
             {
@@ -145,6 +147,10 @@ package cc.minos.codec.mp4.boxs {
         public function get sttsBox():SttsBox
         {
             return _sttsBox;
+        }
+
+        public function get stssBox():StssBox {
+            return _stssBox;
         }
     }
 }

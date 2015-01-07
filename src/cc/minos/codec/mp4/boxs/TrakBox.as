@@ -81,7 +81,7 @@ package cc.minos.codec.mp4.boxs {
             return ( _stblBox.sttsBox.delta / _mdhdBox.timeScale ) * 1000;
         }
 
-        public function get fps():Number
+        public function get framerate():Number
         {
             return ( _stblBox.sttsBox.count / ( _mdhdBox.duration / _mdhdBox.timeScale ) );
         }
@@ -89,6 +89,13 @@ package cc.minos.codec.mp4.boxs {
         public function get stsdBox():StsdBox
         {
             return _stblBox.stsdBox;
+        }
+
+        public function get keyframes():Vector.<uint>
+        {
+            if( _stblBox.stssBox != null )
+                return _stblBox.stssBox.keyframes;
+            return null;
         }
 
     }

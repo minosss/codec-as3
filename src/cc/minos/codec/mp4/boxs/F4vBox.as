@@ -67,7 +67,7 @@ package cc.minos.codec.mp4.boxs {
                         _videoWidth = trak.stsdBox.videoWidth;
                         _videoHeight = trak.stsdBox.videoHeight;
                         _videoConfig = trak.stsdBox.configurationData;
-                        _videoFps = trak.fps;
+                        _videoFps = trak.framerate;
                     }
                     else if( trak.trakType == MP4Constants.TRAK_TYPE_SOUN )
                     {

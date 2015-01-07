@@ -1,7 +1,7 @@
 Codec-AS3
 =========
 
-`NetStream.appendBytes`只支持FLV封裝的格式，在需要播放其他封裝的視頻的話，就必須將其他封裝格式轉成FLV的封裝。編碼用(H.264 & AAC)
+`NetStream.appendBytes()`只支持FLV封裝的格式，在需要播放其他封裝的視頻的話，就必須將其他封裝格式轉成FLV的封裝。編碼用(H.264 & AAC)
 
 ##Libraries
 *  `as3crypto` [As3Crypto](https://code.google.com/p/as3crypto/) is a cryptography library written in Actionscript 3 that provides several common algorithms. 
@@ -21,7 +21,7 @@ var flvbytes:ByteArray = new FlvCodec().encode(mp4);
 netstream.appendBytes(flvbytes);
 ```
 
-##Roadmaps
+##Roadmap
 
 *  視頻壓縮
 *  支持多種封裝
