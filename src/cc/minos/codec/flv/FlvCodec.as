@@ -4,276 +4,279 @@
  * Date: 14/12/23 13:38
  */
 package cc.minos.codec.flv {
-    import cc.minos.codec.*;
+import cc.minos.codec.*;
 
-    import flash.utils.ByteArray;
+import flash.utils.ByteArray;
 
-    public class FlvCodec extends Codec {
+/**
+ * ...
+ * @link http://www.buraks.com/flvmdi/
+ * @link http://www.adobe.com/content/dam/Adobe/en/devnet/flv/pdfs/video_file_format_spec_v10.pdf
+ */
+public class FlvCodec extends Codec {
 
-        public static const AUDIO_TAG:int = 0x08;
-        public static const VIDEO_TAG:int = 0x09;
-        public static const SCRIPT_TAG:int = 0x12;
-        public static const SIGNATURE:String = "FLV";
-
-        public function FlvCodec()
-        {
-            super('flv');
-        }
-
-        protected function makeHeader(flv:*, hasVideo:Boolean = false, hasAudio:Boolean = false):void
-        {
-            var b:ByteArray = new ByteArray();
-            b.writeByte(0x46);
-            b.writeByte(0x4C);
-            b.writeByte(0x56);
-            b.writeByte(0x01);
-            var u:uint = 0;
-            if(hasVideo) u += 1;
-            if(hasAudio) u += 4;
-            b.writeByte(u);
-            b.writeUnsignedInt(0x09);
-            b.writeUnsignedInt(0);
-
-            flv.writeBytes(b);
-            b.length = 0, b = null;
-        }
-
-        protected function makeMateTag(flv:*, duration:Number, width:Number, height:Number, rate:Number):void
-        {
-            var data:ByteArray = new ByteArray();
-            data.writeByte(2); //2 -> string
-            writeUI16(data, 'onMetaData'.length);
-            data.writeUTFBytes('onMetaData');
-            data.writeByte(8); //8 -> array
-            data.writeUnsignedInt(5); //elements
-            writeNumber(data, 'duration', duration);
-            writeNumber(data, 'width', width);
-            writeNumber(data, 'height', height);
-            writeNumber(data, 'framerate', rate);
-            writeString(data, 'metadatacreator', 'codec-as3 by Minos<minoscc@gmail.com>');
-            writeUI24(data, 9);
-
-            makeDataTag(flv, data, 0x12, 0);
-
-            data.length = 0, data = null;
-        }
-
-        protected function makeDataTag(flv:*, data:ByteArray, type:uint = 0x08, timestamp:uint = 0):void
-        {
-            var tag:ByteArray = new ByteArray();
-            tag.writeByte(type); //8 9 18
-            writeUI24(tag, data.length); //
-            writeUI24(tag, timestamp); //
-            tag.writeByte(0); //
-            writeUI24(tag, 0); //stream id
-            //
-            tag.writeBytes(data);
-            //
-            flv.writeBytes(tag);
-            flv.writeUnsignedInt(tag.length);
-
-            tag.length = 0, tag = null;
-        }
-
-        protected function makeVideoTag(flv:*, data:ByteArray, timestamp:Number, frameType:uint, naluType:uint ):void
-        {
-            var tag:ByteArray = new ByteArray();
-            tag.writeByte(FlvCodec.VIDEO_TAG);
-            writeUI24(tag, data.length + 5);
-            writeUI24(tag, timestamp);
-            tag.writeByte(0);
-            writeUI24(tag, 0);
-            //
-            tag.writeByte(frameType);
-            tag.writeByte(naluType);
-            writeUI24(tag, 0); //composition time
-            tag.writeBytes(data);
-
-            flv.writeBytes(tag);
-            flv.writeUnsignedInt(tag.length);
-
-        }
-
-        protected function makeAudioTag(flv:*, data:ByteArray, timestamp:Number, prop:uint, packetType:uint):void
-        {
-            var tag:ByteArray = new ByteArray();
-            tag.writeByte(FlvCodec.AUDIO_TAG);
-            writeUI24(tag, data.length + 2);
-            writeUI24(tag, timestamp);
-            tag.writeByte(0);
-            writeUI24(tag, 0);
-            //
-            tag.writeByte(prop);
-            tag.writeByte(packetType);
-            tag.writeBytes(data);
-
-            flv.writeBytes(tag);
-            flv.writeUnsignedInt(tag.length);
-
-        }
-
-        protected function makeAudioProperties(input:ICodec):uint
-        {
-            var _soundPropertiesByte:uint = 0;
-            _soundPropertiesByte = (10 << 4); //aac
-            _soundPropertiesByte += (3 << 2); //44100 -> 3 22
-            _soundPropertiesByte += (1 << 1); //16bit
-            _soundPropertiesByte += (1 << 0); //stereo (channels=2)
-            return _soundPropertiesByte;
-        }
-
-        override public function encode( input:ICodec ):ByteArray
-        {
-            if( input.type === this.type ) return input.export();
-
-            var ba:ByteArray = new ByteArray();
-            makeHeader(ba, input.hasVideo, input.hasAudio);
-            makeMateTag(ba, input.duration, input.videoWidth, input.videoHeight, input.videoRate);
-
-            if(input.videoConfig){
-                makeVideoTag(ba, input.videoConfig, 0, 0x17, 0);
-            }
-
-            var prop:uint = makeAudioProperties(input);
-            if(input.audioConfig){
-                makeAudioTag(ba, input.audioConfig, 0, prop, 0);
-            }
-
-            for each(var f:IFrame in input.frames)
-            {
-                if(f.dataType == VIDEO_TAG)
-                    makeVideoTag(ba, input.getDataByFrame(f), f.timestamp, (f.frameType == 1) ? 0x17:0x27, 0x01);
-                else
-                    makeAudioTag(ba, input.getDataByFrame(f), f.timestamp, prop, 0x01);
-            }
-            return ba;
-        }
-
-        protected function writeString(stream:*, str:String, value:String):void
-        {
-            writeUI16(stream, str.length);
-            stream.writeUTFBytes(str);
-            stream.writeByte(2); //2 -> string
-            writeUI16(stream, value.length);
-            stream.writeUTFBytes(value);
-        }
-
-        protected function writeNumber(stream:*, str:String, value:Number):void
-        {
-            writeUI16(stream, str.length);
-            stream.writeUTFBytes(str);
-            stream.writeByte(0); //0 -> number
-            stream.writeDouble(value);
-        }
-
-        override public function decode(input:ByteArray):ICodec
-        {
-            _rawData = input;
-            _rawData.position = 0;
-            if(_rawData.readUTFBytes(3) !== FlvCodec.SIGNATURE ) throw new Error('Not a valid FLV file!');
-
-            _rawData.readByte(); //version
-            var info:uint = _rawData.readByte(); //video & audio
-            _rawData.position += 8; //size, pre size 0
-
-            var offset:int;
-            var end:int;
-            var tagLength:int;
-            var currentTag:int;
-            var step:int;
-            var bodyTagHeader:int;
-            var time:int;
-            var timestampExtended:int;
-            var streamID:int;
-            var frame:IFrame;
-
-            _frames = new Vector.<IFrame>();
-            while(_rawData.bytesAvailable > 0)
-            {
-                offset = _rawData.position;
-                currentTag = _rawData.readByte();
-                step = (_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte();
-                time = (_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte();
-                timestampExtended = _rawData.readUnsignedByte();
-                streamID = ((_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte());
-                bodyTagHeader = _rawData.readByte();
-                end = _rawData.position + step + 3;
-                tagLength = end - offset;
-
-                /*if( currentTag == 0x12 )
-                 {
-                 //trace(bodyTagHeader); //2
-                 var l:uint = _rawData.readUnsignedShort();
-                 trace(_rawData.readUTFBytes(l)); //onMetaData
-                 var t:uint = _rawData.readUnsignedByte(); //array = 8
-                 if( t == 0x08 )
-                 {
-                 var num:uint = _rawData.readUnsignedInt(); //array length
-                 var n:String;
-                 for(var i:int=0;i<num;i++)
-                 {
-                 l = _rawData.readUnsignedShort();
-                 n = _rawData.readUTFBytes(l);
-                 t = _rawData.readUnsignedByte();
-                 if( t == 0x00 ) //number
-                 {
-                 _meta[n] = _rawData.readDouble();
-                 }
-                 else if( t == 0x01 ) //boolean
-                 {
-                 _meta[n] = _rawData.readBoolean();
-                 }
-                 else if( t == 0x02 ) //string
-                 {
-                 l = _rawData.readUnsignedShort();
-                 _meta[n] = _rawData.readUTFBytes(l);
-                 }
-                 }
-                 }
-                 }*/
-
-                if(currentTag == 0x12 || currentTag == 0x08 || currentTag == 0x09)
-                {
-                    frame = new FlvFrame();
-                    frame.dataType = currentTag;
-                    frame.offset = offset;
-                    frame.size = tagLength;
-                    _frames.push(frame);
-                }
-                _rawData.position = end;
-            }
-
-            trace('all frames: ' + _frames.length );
-            return this;
-        }
-
-        override public function exportVideo():ByteArray
-        {
-            var ba:ByteArray = new ByteArray();
-            makeHeader( ba, true );
-            for(var i:int = 0; i < _frames.length; i++)
-            {
-                if(_frames[i].dataType == FlvCodec.SCRIPT_TAG || _frames[i].dataType == FlvCodec.VIDEO_TAG )
-                {
-                    ba.writeBytes(getDataByFrame(_frames[i]));
-                }
-            }
-            return ba;
-        }
-
-        override public function exportAudio():ByteArray
-        {
-            var ba:ByteArray = new ByteArray();
-            makeHeader(ba, false, true);
-            for(var i:int = 0; i < _frames.length; i++)
-            {
-                if(_frames[i].dataType == FlvCodec.SCRIPT_TAG || _frames[i].dataType == FlvCodec.AUDIO_TAG )
-                {
-                    ba.writeBytes(getDataByFrame(_frames[i]));
-                }
-            }
-            return ba;
-        }
-
+    public function FlvCodec() {
+        super( 'FLV' );
     }
+
+    protected function byte_bytes( s:*, bytes:ByteArray ):void
+    {
+        s.writeBytes(bytes);
+        byte_wb32(s, bytes.length);
+    }
+
+    protected function byte_string( s:*, str:String ):void
+    {
+        byte_wb16(s, str.length );
+        s.writeUTFBytes(str);
+    }
+
+    protected function byte_boolean( s:*, bool:Boolean ):void
+    {
+        byte_w8(s, FLVConstants.AMF_DATA_TYPE_BOOLEAN );
+        byte_w8(s, int(bool));
+    }
+
+    protected function byte_number( s:*, num:Number ):void
+    {
+        byte_w8(s, FLVConstants.AMF_DATA_TYPE_NUMBER );
+        s.writeDouble(num);
+    }
+
+    protected function byte_header( s:*, input:ICodec ):void {
+
+        var d:ByteArray = new ByteArray();
+        byte_w8(d, 0x46); //F
+        byte_w8(d, 0x4C); //L
+        byte_w8(d, 0x56); //V
+        byte_w8(d, 1);
+        var u:uint = 0;
+        if (input.hasVideo) u += 1;
+        if (input.hasAudio) u += 4;
+        byte_w8(d, u);
+        byte_wb32(d, 9);
+        byte_wb32(d, 0);
+        //
+        byte_w8(d, FLVConstants.TAG_TYPE_META );
+        var metadataSizePos:uint = d.position;
+        byte_wb24(d, 0);
+
+        byte_wb24(d, 0); //ts
+        byte_w8(d, 0);
+        byte_wb24(d, 0); //stream id
+        //
+        byte_w8( d, FLVConstants.AMF_DATA_TYPE_STRING )
+        byte_string(d, 'onMetaData' );
+        byte_w8(d, FLVConstants.AMF_DATA_TYPE_MIXEDARRAY);
+
+        var metadataCountPos:uint = d.position;
+        var metadataCount:uint = 2;
+
+        byte_wb32(d, metadataCount);
+
+        byte_string( d, 'duration' );
+        byte_number( d, input.duration );
+
+        byte_string( d, 'metadatacreator' );
+        byte_w8(d, FLVConstants.AMF_DATA_TYPE_STRING );
+        byte_string( d, 'codec-as3 by SiuzukZan<minoscc@gmail.com>');
+
+        if(input.hasAudio)
+        {
+            byte_string(d, 'sterro');
+            byte_boolean(d, input.audioChannels == 2 );
+            metadataCount ++;
+        }
+
+        if( input.hasVideo )
+        {
+            byte_string(d, 'width');
+            byte_number(d, input.videoWidth);
+            byte_string(d, 'height');
+            byte_number(d, input.videoHeight);
+            byte_string(d, 'framerate');
+            byte_number(d, input.frameRate );
+
+            metadataCount += 3;
+
+            var _hasKey:Boolean = (input.keyframes != null);
+            if( _hasKey )
+            {
+                byte_string(d, 'hasKeyframes' );
+                byte_boolean( d, _hasKey );
+
+                var _len:uint = input.keyframes.length;
+                byte_string(d, 'keyframe');
+                byte_w8(d, FLVConstants.AMF_DATA_TYPE_OBJECT);
+
+                byte_string(d, 'filepositions');
+                byte_w8(d, FLVConstants.AMF_DATA_TYPE_ARRAY);
+                byte_wb32(d, _len); //count
+                for(var i:int =0;i< _len;i++)
+                {
+                    byte_w8(d, FLVConstants.AMF_DATA_TYPE_NUMBER );
+                    byte_wb32(d, 0.0);
+                }
+
+                byte_string(d, 'times');
+                byte_w8(d, FLVConstants.AMF_DATA_TYPE_ARRAY);
+                byte_wb32(d, _len); //count
+                for(var i:int =0;i< _len;i++)
+                {
+                    byte_w8(d, FLVConstants.AMF_DATA_TYPE_NUMBER );
+                    byte_wb32(d, 0.0);
+                }
+                //object end
+                byte_wb24(d, FLVConstants.AMF_DATA_TYPE_OBJECT_END );
+
+                metadataCount ++;
+            }
+        }
+
+        byte_wb24(d, FLVConstants.AMF_END_OF_OBJECT );
+
+        d.position = metadataCountPos;
+        byte_wb32(d, metadataCount );
+
+        d.position = metadataSizePos;
+        byte_wb24(d, d.length - metadataSizePos - 10 );
+
+        d.position = d.length;
+
+        s.writeBytes(d);
+        byte_wb32(s, d.length - 13);
+
+        d.length = 0, d = null;
+    }
+
+    protected function byte_video( s:*, data:ByteArray, timestamp:Number, frameType:uint, naluType:uint):void {
+        var tag:ByteArray = new ByteArray();
+        byte_w8(tag, FLVConstants.TAG_TYPE_VIDEO); //tag type
+        byte_wb24(tag, data.length + 5); //data size
+        byte_wb24(tag, timestamp ); //ts
+        byte_w8(tag, 0 ); //ts ext
+        byte_wb24(tag, 0 ); //stream id
+        //
+        byte_w8(tag, frameType); //
+        byte_w8(tag, naluType);
+        byte_wb24(tag, 0); //ct
+        tag.writeBytes(data);
+
+        byte_bytes(s, tag);
+    }
+
+    protected function byte_audio(s:*, data:ByteArray, timestamp:Number, prop:uint, packetType:uint):void {
+        var tag:ByteArray = new ByteArray();
+        byte_w8(tag, FLVConstants.TAG_TYPE_AUDIO);
+        byte_wb24(tag, data.length + 2);
+        byte_wb24(tag, timestamp );
+        byte_w8(tag, 0 );
+        byte_wb24(tag, 0 );
+        //
+        byte_w8(tag, prop);
+        byte_w8(tag, packetType);
+        tag.writeBytes(data);
+
+        byte_bytes(s, tag);
+    }
+
+    protected function getAudioFlags(input:ICodec):uint {
+        var _soundPropertiesByte:uint = 0;
+        _soundPropertiesByte = FLVConstants.AUDIO_CODECID_AAC;
+        _soundPropertiesByte += FLVConstants.AUDIO_SAMPLERATE_44100HZ;
+        _soundPropertiesByte += FLVConstants.AUDIO_SAMPLESSIZE_16BIT;
+        _soundPropertiesByte += FLVConstants.AUDIO_CHANNEL_STEREO;
+        return _soundPropertiesByte;
+    }
+
+    override public function encode(input:ICodec):ByteArray {
+
+        if (input.type === this.type) return input.export();
+
+        var ba:ByteArray = new ByteArray();
+
+        byte_header(ba, input);
+
+        if ( input.videoConfig ) {
+            byte_video(ba, input.videoConfig, 0, 0x17, 0);
+        }
+
+        var flags:uint = getAudioFlags(input);
+        if ( input.audioConfig ) {
+            byte_audio(ba, input.audioConfig, 0, flags, 0);
+        }
+
+        for each(var f:IFrame in input.frames) {
+            if (f.dataType == FLVConstants.TAG_TYPE_VIDEO )
+                byte_video(ba, input.getDataByFrame(f), f.timestamp, (f.frameType == 1) ? 0x17 : 0x27, 0x01);
+            else
+                byte_audio(ba, input.getDataByFrame(f), f.timestamp, flags, 0x01);
+        }
+        return ba;
+    }
+
+    override public function decode(input:ByteArray):ICodec {
+        _rawData = input;
+        _rawData.position = 0;
+
+        if (_rawData.readUTFBytes(3).toUpperCase() !== "FLV" ) throw new Error('Not a valid FLV file!');
+
+        _rawData.readByte(); //version
+        var info:uint = _rawData.readByte(); //flags
+        _hasAudio = (info >> 2 & 0x1); //audio
+        _hasVideo = (info >> 0 & 0x1); //video
+        _rawData.position += 8; //data offset
+
+        var offset:int;
+        var end:int;
+        var tagLength:int;
+        var currentTag:int;
+        var step:int;
+        var bodyTagHeader:int;
+        var time:int;
+        var timestampExtended:int;
+        var streamID:int;
+        var frame:IFrame;
+
+        _frames = new Vector.<IFrame>();
+        while (_rawData.bytesAvailable > 0 ) {
+            offset = _rawData.position;
+            currentTag = _rawData.readByte();
+            step = (_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte();
+            time = (_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte();
+            timestampExtended = _rawData.readUnsignedByte();
+            streamID = ((_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte());
+            bodyTagHeader = _rawData.readUnsignedByte();
+            end = _rawData.position + step + 3;
+            tagLength = end - offset;
+
+            if ( currentTag == FLVConstants.TAG_TYPE_META || currentTag == FLVConstants.TAG_TYPE_AUDIO || currentTag == FLVConstants.TAG_TYPE_VIDEO ) {
+                frame = new FlvFrame();
+                frame.dataType = currentTag;
+                frame.offset = offset;
+                frame.size = tagLength;
+                if( currentTag == FLVConstants.TAG_TYPE_VIDEO )
+                {
+                    frame.frameType = (bodyTagHeader >> 4); //key or inter ...
+                    frame.codecId = (bodyTagHeader & 0xf);//avc... etc
+                }
+                else if( currentTag == FLVConstants.TAG_TYPE_AUDIO )
+                {
+                    frame.frameType = bodyTagHeader; //
+                    frame.codecId = (bodyTagHeader >> 4); //aac... etc
+//                    (bodyTagHeader >> 4); //sound format 0-15
+//                    (bodyTagHeader >> 2 & 0x03 ); //sound rate 0/1/2/3(5.5/11/22/44-kHz)
+//                    (bodyTagHeader >> 1 & 0x1 ); //sound size 0/1(8b/16b)
+//                    (bodyTagHeader & 0x1 ); //sound type 0/1
+                }
+                _frames.push(frame);
+            }
+            _rawData.position = end;
+        }
+
+        trace('all frames: ' + _frames.length);
+        return this;
+    }
+
+}
 }
