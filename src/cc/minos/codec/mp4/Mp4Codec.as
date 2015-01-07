@@ -21,7 +21,7 @@ package cc.minos.codec.mp4 {
             super('mp4');
         }
 
-        private function sortBydelta(a:Object, b:Object, array:Array = null):int
+        private function sortByTimestamp(a:Object, b:Object, array:Array = null):int
         {
             if( a.timestamp < b.timestamp )
             {
@@ -42,15 +42,13 @@ package cc.minos.codec.mp4 {
 
         override public function decode( input:ByteArray ):ICodec
         {
-            //
-            trace( 'mp4 codec: ')
-            _rawData = input;
+            this._rawData = input;
             //find moov box
             var offset:uint;
             var size:uint;
             var type:uint;
             _rawData.position = 0;
-            while(_rawData.bytesAvailable > 8 )
+            while( _rawData.bytesAvailable > 8 )
             {
                 offset = _rawData.position;
                 size = _rawData.readUnsignedInt();
@@ -67,6 +65,8 @@ package cc.minos.codec.mp4 {
                 }
                 _rawData.position = (offset + size);
             }
+
+            if( moovBox == null ) throw new Error('Not a valid MP4 file!');
             //
             _duration = moovBox.mvhdBox.duration;
             //
@@ -78,10 +78,12 @@ package cc.minos.codec.mp4 {
                     _hasVideo = true;
                     _videoWidth = trak.stsdBox.videoWidth;
                     _videoHeight = trak.stsdBox.videoHeight;
-                    _videoRate = trak.fps;
+                    _frameRate = trak.framerate;
                     _videoSamples = trak.samples;
                     //-- video sps & pps
                     _videoConfig = trak.stsdBox.configurationData;
+                    //
+                    _keyframes = trak.keyframes;
                 }
                 else if( trak.trakType == MP4Constants.TRAK_TYPE_SOUN )
                 {
@@ -109,44 +111,10 @@ package cc.minos.codec.mp4 {
                     _frames.push(a);
                 }
             }
-            _frames.sort(sortBydelta);
+            _frames.sort(sortByTimestamp);
 
             return this;
         }
 
-        override public function encode( input:ICodec ):ByteArray
-        {
-            return null;
-        }
-
-        override public function getDataByFrame(frame:IFrame):ByteArray
-        {
-            var b:ByteArray = new ByteArray();
-            /*if( frame.dataType == 0x09 )
-            {
-                b.writeByte(frame.frameType == 1 ? 0x17 : 0x27);
-                b.writeByte(0x01);
-                writeUI24(b, 0);
-
-            }else if( frame.dataType == 0x08 )
-            {
-                b.writeByte(_soundPropertiesByte);
-                b.writeByte(0x01);
-            }*/
-            b.writeBytes(_rawData, frame.offset, frame.size);
-            return b;
-        }
-
-        override public function exportVideo():ByteArray
-        {
-            var ba:ByteArray = new ByteArray();
-            return ba;
-        }
-
-        override public function exportAudio():ByteArray
-        {
-            var ba:ByteArray = new ByteArray();
-            return ba;
-        }
     }
 }

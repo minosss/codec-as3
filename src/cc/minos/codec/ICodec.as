@@ -14,14 +14,24 @@ package cc.minos.codec {
         function get hasAudio():Boolean;
 
         function get duration():Number;
+        //video
+        function get videoConfig():ByteArray;
+        function get videoCodec():uint;
         function get videoWidth():Number;
         function get videoHeight():Number;
         function get videoRate():Number;
-
-        function get videoConfig():ByteArray;
+        function get frameRate():Number;
+        //audio
         function get audioConfig():ByteArray;
+        function get audioCodec():uint;
+        function get audioType():uint;
+        function get audioRate():Number;
+        function get audioSize():Number;
+        function get audioChannels():uint;
 
+        //video & audio frames
         function get frames():Vector.<IFrame>
+        function get keyframes():Vector.<uint>;
 
         /** **/
         function decode( input:ByteArray ):ICodec;

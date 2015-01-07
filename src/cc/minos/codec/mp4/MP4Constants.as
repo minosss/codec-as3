@@ -134,12 +134,12 @@ package cc.minos.codec.mp4 {
                 case BOX_TYPE_STSZ:
                     box = new StszBox();
                     break;
-                case BOX_TYPE_AVCC:
+                /*case BOX_TYPE_AVCC:
                     box = new AvccBox();
                     break;
                 case BOX_TYPE_ESDS:
                     box = new EsdsBox();
-                    break;
+                    break;*/
                 case BOX_TYPE_TKHD:
                     box = new TkhdBox();
                     break;
@@ -152,11 +152,6 @@ package cc.minos.codec.mp4 {
                 case BOX_TYPE_MDHD:
                     box = new MdhdBox();
                     break;
-                //video
-                case BOX_TYPE_AVC1:
-                case BOX_TYPE_BTRT:
-                case BOX_TYPE_MP4A:
-                //audio
                 //others
                 case BOX_TYPE_MDIA:
                 case BOX_TYPE_MINF:
@@ -169,6 +164,9 @@ package cc.minos.codec.mp4 {
                 case BOX_TYPE_DREF:
                 case BOX_TYPE_FREE:
                     box = new Box(type);
+                    break;
+                default :
+                    trace('[MP4::getBox] 0x' + type.toString(16) + ' not defined.');
             }
             return box;
         }
