@@ -4,13 +4,13 @@
  * Date: 14/12/29 17:48
  */
 package cc.minos.codec.matroska.elements {
-    import cc.minos.codec.matroska.MaConstans;
+    import cc.minos.codec.matroska.Matroska;
 
     public class Segment extends Element {
 
         public function Segment()
         {
-            super(MaConstans.SEGMENT_ID);
+            super(cc.minos.codec.matroska.Matroska.SEGMENT_ID);
         }
 
         override protected function init():void
@@ -24,15 +24,15 @@ package cc.minos.codec.matroska.elements {
         {
             switch(type)
             {
-                case MaConstans.SEEK_HEAD:
+                case cc.minos.codec.matroska.Matroska.SEEK_HEAD:
                     return new SeekHead();
-                case MaConstans.SEGMENT_INFO:
+                case cc.minos.codec.matroska.Matroska.SEGMENT_INFO:
                     return new SegmentInfo();
-                case MaConstans.TRACKS:
+                case cc.minos.codec.matroska.Matroska.TRACKS:
                     return new SegmentTracks();
-                case MaConstans.CLUSTER:
+                case cc.minos.codec.matroska.Matroska.CLUSTER:
                     return new Cluster();
-                case MaConstans.CUES:
+                case cc.minos.codec.matroska.Matroska.CUES:
                     return new Cues();
             }
             return super .getElement(type);

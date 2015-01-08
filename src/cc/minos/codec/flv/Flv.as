@@ -6,7 +6,7 @@ package cc.minos.codec.flv {
     /**
      *
      */
-    public class FLVConstants {
+    public class Flv {
 
         //offset
         public static const AUDIO_SAMPLESSIZE_OFFSET:uint = 1;

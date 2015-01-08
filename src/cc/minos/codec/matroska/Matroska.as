@@ -5,7 +5,7 @@
  */
 package cc.minos.codec.matroska {
 
-    public class MaConstans {
+    public class Matroska {
 
         //
         public static const VOID:uint = 0xEC;

@@ -3,9 +3,9 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/8 16:36
  */
-package cc.minos.codec.mp4.boxs {
+package cc.minos.codec.mov.boxs {
 
-    import cc.minos.codec.mp4.MP4Constants;
+    import cc.minos.codec.mov.Mp4;
     import cc.minos.codec.utils.ByteArrayUtil;
     import flash.utils.ByteArray;
 
@@ -48,7 +48,7 @@ package cc.minos.codec.mp4.boxs {
                     continue;
                 }
                 end = offset + size;
-                box = MP4Constants.getBox(type);
+                box = Mp4.getBox(type);
                 if( box )
                 {
                     box.size = size;
@@ -174,7 +174,7 @@ package cc.minos.codec.mp4.boxs {
                 data.position = index - 4;
                 var size:int = data.readUnsignedInt();
                 byte.writeBytes(data, index - 4, size);
-                var box:Box = MP4Constants.getBox(type);
+                var box:Box = Mp4.getBox(type);
                 box.parse(byte);
                 box.position = index - 4;
                 return box;

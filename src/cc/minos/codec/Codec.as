@@ -8,10 +8,13 @@ package cc.minos.codec {
 
     public class Codec extends Object implements ICodec {
 
-        private var _type:String = ':)'
+        protected var _name:String = ':)'
+        protected var _extensions:String;
+        protected var _mimeType:String;
 
         protected var _rawData:ByteArray = null;;
 
+        //
         protected var _frames:Vector.<IFrame> = new Vector.<IFrame>();
         protected var _keyframes:Vector.<uint> = null;
 
@@ -35,9 +38,8 @@ package cc.minos.codec {
 
         protected var _duration:Number = 0.0;
 
-        public function Codec( type:String )
+        public function Codec( )
         {
-            this._type = type;
         }
 
         /* byte handlers */
@@ -111,6 +113,11 @@ package cc.minos.codec {
             return null;
         }
 
+        public function probe(input:ByteArray):Boolean
+        {
+            return false;
+        }
+
         public function getDataByFrame(frame:IFrame):ByteArray
         {
             var b:ByteArray = new ByteArray();
@@ -133,19 +140,9 @@ package cc.minos.codec {
             return null;
         }
 
-        public function get type():String
+        public function get name():String
         {
-            return _type;
-        }
-
-        public function get hasVideo():Boolean
-        {
-            return _hasVideo;
-        }
-
-        public function get hasAudio():Boolean
-        {
-            return _hasAudio;
+            return _name;
         }
 
         public function get frames():Vector.<IFrame>
@@ -165,6 +162,16 @@ package cc.minos.codec {
         public function get frameRate():Number
         {
             return _frameRate;
+        }
+
+        public function get hasVideo():Boolean
+        {
+            return _hasVideo;
+        }
+
+        public function get hasAudio():Boolean
+        {
+            return _hasAudio;
         }
 
         public function get videoConfig():ByteArray

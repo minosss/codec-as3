@@ -3,10 +3,10 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/24 15:36
  */
-package cc.minos.codec.mp4 {
+package cc.minos.codec.mov {
 
     import cc.minos.codec.*;
-    import cc.minos.codec.mp4.boxs.*;
+    import cc.minos.codec.mov.boxs.*;
 
     import flash.utils.ByteArray;
 
@@ -18,7 +18,9 @@ package cc.minos.codec.mp4 {
 
         public function Mp4Codec()
         {
-            super('mp4');
+            _name = "mp4,f4v";
+            _extensions = "mp4,f4v";
+            _mimeType = "application/mp4,application/f4v";
         }
 
         private function sortByTimestamp(a:Object, b:Object, array:Array = null):int
@@ -42,6 +44,9 @@ package cc.minos.codec.mp4 {
 
         override public function decode( input:ByteArray ):ICodec
         {
+            if(!probe(input))
+                throw new Error('Not a valid MP4 file!');
+
             this._rawData = input;
             //find moov box
             var offset:uint;
@@ -53,7 +58,7 @@ package cc.minos.codec.mp4 {
                 offset = _rawData.position;
                 size = _rawData.readUnsignedInt();
                 type = _rawData.readUnsignedInt();
-                if( type == MP4Constants.BOX_TYPE_MOOV )
+                if( type == Mp4.BOX_TYPE_MOOV )
                 {
                     var d:ByteArray = new ByteArray();
                     d.writeBytes(_rawData, offset, size);
@@ -65,15 +70,13 @@ package cc.minos.codec.mp4 {
                 }
                 _rawData.position = (offset + size);
             }
-
-            if( moovBox == null ) throw new Error('Not a valid MP4 file!');
             //
             _duration = moovBox.mvhdBox.duration;
             //
             for(var i:int =0;i< moovBox.traks.length; i++)
             {
                 var trak:TrakBox = moovBox.traks[i] as TrakBox;
-                if( trak.trakType == MP4Constants.TRAK_TYPE_VIDE )
+                if( trak.trakType == Mp4.TRAK_TYPE_VIDE )
                 {
                     _hasVideo = true;
                     _videoWidth = trak.stsdBox.videoWidth;
@@ -82,10 +85,9 @@ package cc.minos.codec.mp4 {
                     _videoSamples = trak.samples;
                     //-- video sps & pps
                     _videoConfig = trak.stsdBox.configurationData;
-                    //
                     _keyframes = trak.keyframes;
                 }
-                else if( trak.trakType == MP4Constants.TRAK_TYPE_SOUN )
+                else if( trak.trakType == Mp4.TRAK_TYPE_SOUN )
                 {
                     _hasAudio = true;
                     _audioChannels = trak.stsdBox.audioChannels;
@@ -116,5 +118,16 @@ package cc.minos.codec.mp4 {
             return this;
         }
 
+        override public function encode(input:ICodec):ByteArray
+        {
+            return null;
+        }
+
+        override public function probe(input:ByteArray):Boolean
+        {
+            if( input[4] == 0x66 && input[5] == 0x74 && input[6] == 0x79 && input[7] == 0x70 )
+                return true;
+            return false;
+        }
     }
 }

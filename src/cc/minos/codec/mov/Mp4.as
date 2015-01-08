@@ -3,10 +3,10 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/8 16:30
  */
-package cc.minos.codec.mp4 {
-    import cc.minos.codec.mp4.boxs.*;
+package cc.minos.codec.mov {
+    import cc.minos.codec.mov.boxs.*;
 
-    public class MP4Constants {
+    public class Mp4 {
 
         /** audio codec **/
 

@@ -3,9 +3,9 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/10 15:21
  */
-package cc.minos.codec.mp4 {
+package cc.minos.codec.mov {
     import cc.minos.codec.IFrame;
-    import cc.minos.codec.flv.FLVConstants;
+    import cc.minos.codec.flv.Flv;
 
     public class Sample extends Object implements IFrame, IMp4Frame{
 

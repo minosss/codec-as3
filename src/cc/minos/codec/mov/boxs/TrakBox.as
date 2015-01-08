@@ -3,9 +3,10 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/8 17:53
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.MP4Constants;
-    import cc.minos.codec.mp4.Sample;
+package cc.minos.codec.mov.boxs {
+
+    import cc.minos.codec.mov.Mp4;
+    import cc.minos.codec.mov.Sample;
 
     import flash.utils.ByteArray;
 
@@ -24,21 +25,22 @@ package cc.minos.codec.mp4.boxs {
 
         public function TrakBox()
         {
-            super( MP4Constants.BOX_TYPE_TRAK );
+            super( Mp4.BOX_TYPE_TRAK );
         }
 
         override protected function init():void
         {
             //type
-            _hdlrBox = getBox(MP4Constants.BOX_TYPE_HDLR).shift() as HdlrBox;
-            _mdhdBox = getBox(MP4Constants.BOX_TYPE_MDHD).shift() as MdhdBox;
-            _tkhdBox = getBox(MP4Constants.BOX_TYPE_TKHD).shift() as TkhdBox;
-            _stblBox = getBox(MP4Constants.BOX_TYPE_STBL).shift() as StblBox;
+            _hdlrBox = getBox(Mp4.BOX_TYPE_HDLR).shift() as HdlrBox;
+            _mdhdBox = getBox(Mp4.BOX_TYPE_MDHD).shift() as MdhdBox;
+            _tkhdBox = getBox(Mp4.BOX_TYPE_TKHD).shift() as TkhdBox;
+            _stblBox = getBox(Mp4.BOX_TYPE_STBL).shift() as StblBox;
 
             for each(var sample:Sample in _stblBox.samples )
             {
                 sample.timestamp = sample.index * sampleDelta;
             }
+
         }
 
         public function get trakType():uint

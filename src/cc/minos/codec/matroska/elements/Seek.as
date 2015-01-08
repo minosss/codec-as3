@@ -4,7 +4,7 @@
  * Date: 14/12/31 10:19
  */
 package cc.minos.codec.matroska.elements {
-    import cc.minos.codec.matroska.MaConstans;
+    import cc.minos.codec.matroska.Matroska;
 
     public class Seek extends Element {
 
@@ -13,15 +13,15 @@ package cc.minos.codec.matroska.elements {
 
         public function Seek()
         {
-            super(MaConstans.SEEK);
+            super(cc.minos.codec.matroska.Matroska.SEEK);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case MaConstans.SEEK_ID:
-                case MaConstans.SEEK_POSITION:
+                case cc.minos.codec.matroska.Matroska.SEEK_ID:
+                case cc.minos.codec.matroska.Matroska.SEEK_POSITION:
                     return new VarElement(type);
             }
             return super.getElement(type);

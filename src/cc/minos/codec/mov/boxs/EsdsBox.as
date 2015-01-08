@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/10 15:56
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.MP4Constants;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.Mp4;
 
     import flash.utils.ByteArray;
 
@@ -14,7 +14,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function EsdsBox()
         {
-            super(MP4Constants.BOX_TYPE_ESDS);
+            super(Mp4.BOX_TYPE_ESDS);
         }
 
         override protected function init():void

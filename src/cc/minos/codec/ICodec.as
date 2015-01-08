@@ -8,18 +8,20 @@ package cc.minos.codec {
 
     public interface ICodec {
 
-        function get type():String;
+        function get name():String;
 
         function get hasVideo():Boolean;
         function get hasAudio():Boolean;
 
         function get duration():Number;
+
         //video
         function get videoConfig():ByteArray;
         function get videoCodec():uint;
         function get videoWidth():Number;
         function get videoHeight():Number;
         function get videoRate():Number;
+
         function get frameRate():Number;
         //audio
         function get audioConfig():ByteArray;
@@ -36,6 +38,7 @@ package cc.minos.codec {
         /** **/
         function decode( input:ByteArray ):ICodec;
         function encode( input:ICodec ):ByteArray;
+        function probe( input:ByteArray ):Boolean;
 
         function getDataByFrame(frame:IFrame):ByteArray
 

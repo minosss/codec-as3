@@ -7,7 +7,7 @@ package cc.minos.codec.matroska {
 
     import cc.minos.codec.Codec;
     import cc.minos.codec.ICodec;
-    import cc.minos.codec.matroska.elements.Matroska;
+    import cc.minos.codec.matroska.elements.MatroskaElement;
     import flash.utils.ByteArray;
 
     /**
@@ -19,7 +19,9 @@ package cc.minos.codec.matroska {
 
         public function MatroskaCodec()
         {
-            super('matroska');
+            _name = "matroska,webm";
+            _extensions = "mkv,mk3d,mka,mks";
+            _mimeType = "audio/webm,audio/x-matroska,video/webm,video/x-matroska";
         }
 
         override public function decode(input:ByteArray):ICodec
@@ -27,7 +29,7 @@ package cc.minos.codec.matroska {
             //
             this._rawData = input;
 
-            var m:Matroska = new Matroska();
+            var m:MatroskaElement = new MatroskaElement();
             m.parse(_rawData);
 
             return this;
