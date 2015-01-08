@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/8 17:41
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.MP4Constants;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.MovConstants;
 
     public class MvhdBox extends Box {
 
@@ -14,7 +14,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function MvhdBox()
         {
-            super( MP4Constants.BOX_TYPE_MVHD );
+            super( MovConstants.BOX_TYPE_MVHD );
         }
 
         override protected function init():void

@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/10 15:05
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.MP4Constants;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.MovConstants;
 
     /**
      * sync sample table (key frames)
@@ -16,7 +16,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function StssBox()
         {
-            super(MP4Constants.BOX_TYPE_STSS);
+            super(MovConstants.BOX_TYPE_STSS);
         }
 
         override protected function init():void

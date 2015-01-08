@@ -3,9 +3,9 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/16 14:06
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.MP4Constants;
-    import cc.minos.codec.mp4.Sample;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Sample;
 
     import flash.utils.ByteArray;
 
@@ -49,8 +49,8 @@ package cc.minos.codec.mp4.boxs {
         override protected function init():void
         {
             //
-            _ftypBox = getBox(MP4Constants.BOX_TYPE_FTYP).shift() as FtypBox;
-            _moovBox = getBox(MP4Constants.BOX_TYPE_MOOV).shift() as MoovBox;
+            _ftypBox = getBox(MovConstants.BOX_TYPE_FTYP).shift() as FtypBox;
+            _moovBox = getBox(MovConstants.BOX_TYPE_MOOV).shift() as MoovBox;
 
             _duration = _moovBox.mvhdBox.duration;
 
@@ -60,7 +60,7 @@ package cc.minos.codec.mp4.boxs {
                 var trak:TrakBox = _moovBox.traks[i] as TrakBox;
                 if(trak)
                 {
-                    if( trak.trakType == MP4Constants.TRAK_TYPE_VIDE )
+                    if( trak.trakType == MovConstants.TRAK_TYPE_VIDE )
                     {
                         _hasVideo = true;
                         _videoSamples = trak.samples;
@@ -69,7 +69,7 @@ package cc.minos.codec.mp4.boxs {
                         _videoConfig = trak.stsdBox.configurationData;
                         _videoFps = trak.framerate;
                     }
-                    else if( trak.trakType == MP4Constants.TRAK_TYPE_SOUN )
+                    else if( trak.trakType == MovConstants.TRAK_TYPE_SOUN )
                     {
                         _hasAudio = true;
                         _audioSamples = trak.samples;

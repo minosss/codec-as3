@@ -3,9 +3,9 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/15 10:43
  */
-package cc.minos.codec.mp4.boxs {
+package cc.minos.codec.mov.boxs {
 
-    import cc.minos.codec.mp4.MP4Constants;
+    import cc.minos.codec.mov.MovConstants;
     import flash.utils.ByteArray;
 
     public class StsdBox extends Box {
@@ -13,16 +13,18 @@ package cc.minos.codec.mp4.boxs {
         //video
         private var _videoWidth:uint;
         private var _videoHeight:uint;
+        private var _videoCodecId:uint;
         //audio
         private var _audioChannels:uint;
         private var _audioSize:uint;
         private var _audioRate:Number;
+        private var _audioCodecId:uint;
         //
         private var _configurationData:ByteArray;
 
         public function StsdBox()
         {
-            super(MP4Constants.BOX_TYPE_STSD);
+            super(MovConstants.BOX_TYPE_STSD);
         }
 
         override protected function decode():void
@@ -40,7 +42,7 @@ package cc.minos.codec.mp4.boxs {
             _configurationData = new ByteArray();
             var offset:uint;
             var len:uint;
-            if(codecType == MP4Constants.BOX_TYPE_AVC1)
+            if(codecType == MovConstants.BOX_TYPE_AVC1)
             {
                 //6 reserved
                 data.position += 6;
@@ -101,7 +103,7 @@ package cc.minos.codec.mp4.boxs {
                 _configurationData.writeBytes( data, offset, data.bytesAvailable );
 
             }
-            else if(codecType == MP4Constants.BOX_TYPE_MP4A )
+            else if(codecType == MovConstants.BOX_TYPE_MP4A )
             {
                 //6 reserved
                 data.position += 6;
@@ -124,7 +126,7 @@ package cc.minos.codec.mp4.boxs {
                 //2 audio packet size 0
                 data.readShort();
                 //4 audio sample rate
-                _audioRate = data.readUnsignedInt() / MP4Constants.FIXED_POINT_16_16
+                _audioRate = data.readUnsignedInt() / MovConstants.FIXED_POINT_16_16
                 trace('rate: ' + _audioRate );
 
                 //========= ESDS | M4DS ==========
@@ -150,7 +152,7 @@ package cc.minos.codec.mp4.boxs {
                 trace('configuration: ' + _configurationData.length );
 
             }
-            else if(codecType == MP4Constants.BOX_TYPE_MP4S)
+            else if(codecType == MovConstants.BOX_TYPE_MP4S)
             {
                 //
             }
