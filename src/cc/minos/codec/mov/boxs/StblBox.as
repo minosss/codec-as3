@@ -109,10 +109,10 @@ package cc.minos.codec.mov.boxs {
                     s.size = sizes[samIndex];
                     if( hasKey )
                     {
-                        s.dataType = 0x09;
+                        s.dataType = Flv.TAG_TYPE_VIDEO;
                         s.frameType = (keyframes.indexOf(samIndex) != -1) ? Flv.VIDEO_FRAME_KEY : Flv.VIDEO_FRAME_INTER;
                     }else{
-                        s.dataType = 0x08;
+                        s.dataType = Flv.TAG_TYPE_AUDIO;
                     }
                     _samples.push(s);
                     offset += sizes[samIndex];

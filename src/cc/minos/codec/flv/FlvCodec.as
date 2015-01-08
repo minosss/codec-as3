@@ -16,6 +16,11 @@ package cc.minos.codec.flv {
 	 */
 	public class FlvCodec extends Codec {
 
+		private var _filepositionsPos:uint;
+		private var _timesPos:uint;
+
+		private var keyframesList:Array;
+
 		public function FlvCodec()
 		{
 			_name = "flv";
@@ -95,10 +100,12 @@ package cc.minos.codec.flv {
 
 				var _hasKey:Boolean = (input.keyframes != null);
 				if (_hasKey) {
+					keyframesList = [];
+
 					byte_string(d, 'hasKeyframes');
 					byte_boolean(d, _hasKey);
 
-					var _len:uint = input.keyframes.length;
+					var _len:uint = input.keyframes.length+1;
 					byte_string(d, 'keyframes');
 					byte_w8(d, Flv.AMF_DATA_TYPE_OBJECT);
 
@@ -106,6 +113,7 @@ package cc.minos.codec.flv {
 					byte_w8(d, Flv.AMF_DATA_TYPE_ARRAY);
 					byte_wb32(d, _len); //count
 
+					_filepositionsPos = d.position;
 					for (var i:int = 0; i < _len; i++) {
 						byte_number(d, 0.0);
 					}
@@ -113,6 +121,8 @@ package cc.minos.codec.flv {
 					byte_string(d, 'times');
 					byte_w8(d, Flv.AMF_DATA_TYPE_ARRAY);
 					byte_wb32(d, _len); //count
+
+					_timesPos = d.position;
 					for (var i:int = 0; i < _len; i++) {
 						byte_number(d, 0.0);
 					}
@@ -137,32 +147,35 @@ package cc.minos.codec.flv {
 			d.length = 0, d = null;
 		}
 
-		protected function byte_video(s:*, data:ByteArray, timestamp:Number, frameType:uint, naluType:uint):void
+		protected function byte_video(s:*, data:ByteArray, timestamp:Number, frameType:uint, codecId:uint, naluType:uint = 1, flagsSize:uint = 5 ):void
 		{
 			var tag:ByteArray = new ByteArray();
 			byte_w8(tag, Flv.TAG_TYPE_VIDEO); //tag type
-			byte_wb24(tag, data.length + 5); //data size
+			byte_wb24(tag, data.length + flagsSize ); //data size
 			byte_wb24(tag, timestamp); //ts
 			byte_w8(tag, 0); //ts ext
 			byte_wb24(tag, 0); //stream id
 			//avc data
-			byte_w8(tag, frameType); //
+			byte_w8(tag, (frameType + codecId)); //
 			byte_w8(tag, naluType);
 			byte_wb24(tag, 0); //ct
 			tag.writeBytes(data);
-
+			//save the keyframe information
+			if( frameType == Flv.VIDEO_FRAME_KEY )
+			{
+				keyframesList.push( { 'time': parseFloat((timestamp/1000).toFixed(2)) , 'position': s.position });
+			}
 			//add tag and pre tag size
 			s.writeBytes(tag), byte_wb32(s, tag.length);
 
 			tag.length = 0, tag = null;
-
 		}
 
-		protected function byte_audio(s:*, data:ByteArray, timestamp:Number, prop:uint, packetType:uint):void
+		protected function byte_audio(s:*, data:ByteArray, timestamp:Number, prop:uint, packetType:uint = 1, flagsSize:uint = 2):void
 		{
 			var tag:ByteArray = new ByteArray();
 			byte_w8(tag, Flv.TAG_TYPE_AUDIO );
-			byte_wb24(tag, data.length + 2);
+			byte_wb24(tag, data.length + flagsSize );
 			byte_wb24(tag, timestamp); //ts
 			byte_w8(tag, 0); //ts ext
 			byte_wb24(tag, 0); //stream
@@ -194,7 +207,7 @@ package cc.minos.codec.flv {
 			byte_header(ba, input);
 
 			if (input.videoConfig ) {
-				byte_video(ba, input.videoConfig, 0, (Flv.VIDEO_FRAME_KEY + Flv.VIDEO_CODECID_H264), 0);
+				byte_video(ba, input.videoConfig, 0, Flv.VIDEO_FRAME_KEY, Flv.VIDEO_CODECID_H264, 0);
 			}
 
 			var flags:uint = getAudioFlags(input);
@@ -202,12 +215,28 @@ package cc.minos.codec.flv {
 				byte_audio(ba, input.audioConfig, 0, flags, 0);
 			}
 
-			for each(var f:IFrame in input.frames) {
+			for( var i:int=0; i<input.frames.length; i++ )
+			{
+				var f:IFrame = input.frames[i];
 				if (f.dataType == Flv.TAG_TYPE_VIDEO)
-					byte_video(ba, input.getDataByFrame(f), f.timestamp, (f.frameType == Flv.VIDEO_FRAME_KEY) ? (Flv.VIDEO_FRAME_KEY + Flv.VIDEO_CODECID_H264)
- : (Flv.VIDEO_FRAME_INTER + Flv.VIDEO_CODECID_H264), 1);
+					byte_video(ba, input.getDataByFrame(f), f.timestamp, f.frameType, Flv.VIDEO_CODECID_H264 );
 				else
-					byte_audio(ba, input.getDataByFrame(f), f.timestamp, flags, 1);
+					byte_audio(ba, input.getDataByFrame(f), f.timestamp, flags);
+			}
+			//update meta's keyframes
+			if( keyframesList && keyframesList.length > 0 )
+			{
+				ba.position = _timesPos;
+				for(var k:uint = 0; k < keyframesList.length; k++ )
+				{
+					byte_number(ba, keyframesList[k].time );
+				}
+				ba.position = _filepositionsPos;
+				for( k = 0; k <keyframesList.length; k++ )
+				{
+					byte_number( ba, keyframesList[k].position );
+				}
+				ba.position = 0;
 			}
 			return ba;
 		}
