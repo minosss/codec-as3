@@ -4,7 +4,7 @@
  * Date: 14/12/18 14:17
  */
 package cc.minos.codec.mov.boxs {
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
 
     public class SttsBox extends Box {
 
@@ -13,7 +13,7 @@ package cc.minos.codec.mov.boxs {
 
         public function SttsBox()
         {
-            super(MovConstants.BOX_TYPE_STTS);
+            super(Mp4.BOX_TYPE_STTS);
         }
 
         override protected function init():void

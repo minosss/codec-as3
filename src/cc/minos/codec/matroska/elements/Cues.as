@@ -4,19 +4,19 @@
  * Date: 14/12/30 17:32
  */
 package cc.minos.codec.matroska.elements {
-    import cc.minos.codec.matroska.MaConstans;
+    import cc.minos.codec.matroska.Matroska;
 
     public class Cues extends Element {
         public function Cues()
         {
-            super(MaConstans.CUES);
+            super(cc.minos.codec.matroska.Matroska.CUES);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case MaConstans.CUES_CUE_POINT:
+                case cc.minos.codec.matroska.Matroska.CUES_CUE_POINT:
                     return new CuePoint();
             }
             return super.getElement(type);

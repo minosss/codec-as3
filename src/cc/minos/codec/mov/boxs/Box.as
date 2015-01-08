@@ -5,7 +5,7 @@
  */
 package cc.minos.codec.mov.boxs {
 
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
     import cc.minos.codec.utils.ByteArrayUtil;
     import flash.utils.ByteArray;
 
@@ -48,7 +48,7 @@ package cc.minos.codec.mov.boxs {
                     continue;
                 }
                 end = offset + size;
-                box = MovConstants.getBox(type);
+                box = Mp4.getBox(type);
                 if( box )
                 {
                     box.size = size;
@@ -174,7 +174,7 @@ package cc.minos.codec.mov.boxs {
                 data.position = index - 4;
                 var size:int = data.readUnsignedInt();
                 byte.writeBytes(data, index - 4, size);
-                var box:Box = MovConstants.getBox(type);
+                var box:Box = Mp4.getBox(type);
                 box.parse(byte);
                 box.position = index - 4;
                 return box;

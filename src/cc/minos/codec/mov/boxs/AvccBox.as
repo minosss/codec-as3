@@ -5,7 +5,7 @@
  */
 package cc.minos.codec.mov.boxs {
 
-	import cc.minos.codec.mov.MovConstants;
+	import cc.minos.codec.mov.Mp4;
 
 	import flash.utils.ByteArray;
 
@@ -18,7 +18,7 @@ package cc.minos.codec.mov.boxs {
 
 		public function AvccBox()
 		{
-			super(MovConstants.BOX_TYPE_AVCC);
+			super(Mp4.BOX_TYPE_AVCC);
 		}
 
 		override protected function init():void

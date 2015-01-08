@@ -4,7 +4,7 @@
  * Date: 14/12/10 14:59
  */
 package cc.minos.codec.mov.boxs {
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
 
     /**
      * chunk offset
@@ -16,7 +16,7 @@ package cc.minos.codec.mov.boxs {
 
         public function StcoBox()
         {
-            super(MovConstants.BOX_TYPE_STCO);
+            super(Mp4.BOX_TYPE_STCO);
         }
 
         override protected function init():void

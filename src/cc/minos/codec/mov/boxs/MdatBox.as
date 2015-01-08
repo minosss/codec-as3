@@ -4,13 +4,13 @@
  * Date: 14/12/9 10:10
  */
 package cc.minos.codec.mov.boxs {
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
 
     public class MdatBox extends Box {
 
         public function MdatBox()
         {
-            super(MovConstants.BOX_TYPE_MDAT);
+            super(Mp4.BOX_TYPE_MDAT);
         }
 
         override protected function init():void

@@ -5,9 +5,9 @@
  */
 package cc.minos.codec.mov {
     import cc.minos.codec.IFrame;
-    import cc.minos.codec.flv.FLVConstants;
+    import cc.minos.codec.flv.Flv;
 
-    public class Sample extends Object implements IFrame, IMovFrame{
+    public class Sample extends Object implements IFrame, IMp4Frame{
 
         private var _offset:uint = 0;
 

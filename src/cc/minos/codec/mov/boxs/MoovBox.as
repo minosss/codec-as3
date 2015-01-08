@@ -4,7 +4,7 @@
  * Date: 14/12/8 17:31
  */
 package cc.minos.codec.mov.boxs {
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
 
     public class MoovBox extends Box {
 
@@ -13,14 +13,14 @@ package cc.minos.codec.mov.boxs {
 
         public function MoovBox()
         {
-            super( MovConstants.BOX_TYPE_MOOV );
+            super( Mp4.BOX_TYPE_MOOV );
         }
 
         override protected function init():void
         {
             trace('moov ======' );
-            _mvhdBox = getBox( MovConstants.BOX_TYPE_MVHD ).shift() as MvhdBox;
-            _traks = getBox( MovConstants.BOX_TYPE_TRAK );
+            _mvhdBox = getBox( Mp4.BOX_TYPE_MVHD ).shift() as MvhdBox;
+            _traks = getBox( Mp4.BOX_TYPE_TRAK );
 
             trace('streams: ' + _traks.length );
         }

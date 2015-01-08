@@ -4,7 +4,7 @@
  * Date: 14/12/18 14:22
  */
 package cc.minos.codec.mov.boxs {
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
 
     public class MdhdBox extends Box {
 
@@ -14,7 +14,7 @@ package cc.minos.codec.mov.boxs {
 
         public function MdhdBox()
         {
-            super(MovConstants.BOX_TYPE_MDHD);
+            super(Mp4.BOX_TYPE_MDHD);
         }
 
         override protected function init():void

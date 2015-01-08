@@ -5,7 +5,7 @@
  */
 package cc.minos.codec.matroska.elements {
 
-    import cc.minos.codec.matroska.MaConstans;
+    import cc.minos.codec.matroska.Matroska;
 
     import com.hurlant.math.BigInteger;
     import com.hurlant.util.Hex;
@@ -109,8 +109,8 @@ package cc.minos.codec.matroska.elements {
         protected function getElement(type:uint):Element
         {
             switch(type){
-                case MaConstans.VOID:
-                case MaConstans.CRC_32:
+                case cc.minos.codec.matroska.Matroska.VOID:
+                case cc.minos.codec.matroska.Matroska.CRC_32:
                     return new GlobalElement(type);
             }
             return null;

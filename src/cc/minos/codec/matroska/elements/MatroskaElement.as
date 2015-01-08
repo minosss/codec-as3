@@ -4,11 +4,11 @@
  * Date: 14/12/30 16:47
  */
 package cc.minos.codec.matroska.elements {
-    import cc.minos.codec.matroska.MaConstans;
+    import cc.minos.codec.matroska.Matroska;
 
-    public class Matroska extends Element {
+    public class MatroskaElement extends Element {
 
-        public function Matroska()
+        public function MatroskaElement()
         {
             super(0x528802);
         }
@@ -17,9 +17,9 @@ package cc.minos.codec.matroska.elements {
         {
             switch (type)
             {
-                case MaConstans.EBML_ID:
+                case Matroska.EBML_ID:
                     return new EbmlHeader();
-                case MaConstans.SEGMENT_ID:
+                case Matroska.SEGMENT_ID:
                     return new Segment();
             }
             return super.getElement(type);

@@ -4,7 +4,7 @@
  * Date: 14/12/10 14:50
  */
 package cc.minos.codec.mov.boxs {
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
 
     /**
      * sample size list
@@ -17,7 +17,7 @@ package cc.minos.codec.mov.boxs {
 
         public function StszBox()
         {
-            super(MovConstants.BOX_TYPE_STSZ);
+            super(Mp4.BOX_TYPE_STSZ);
         }
 
         override protected function init():void

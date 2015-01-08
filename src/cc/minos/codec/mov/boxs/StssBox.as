@@ -4,7 +4,7 @@
  * Date: 14/12/10 15:05
  */
 package cc.minos.codec.mov.boxs {
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
 
     /**
      * sync sample table (key frames)
@@ -16,7 +16,7 @@ package cc.minos.codec.mov.boxs {
 
         public function StssBox()
         {
-            super(MovConstants.BOX_TYPE_STSS);
+            super(Mp4.BOX_TYPE_STSS);
         }
 
         override protected function init():void

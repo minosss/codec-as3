@@ -4,7 +4,7 @@
  * Date: 14/12/8 16:41
  */
 package cc.minos.codec.mov.boxs {
-    import cc.minos.codec.mov.MovConstants;
+    import cc.minos.codec.mov.Mp4;
 
     public class FtypBox extends Box {
 
@@ -14,7 +14,7 @@ package cc.minos.codec.mov.boxs {
 
         public function FtypBox()
         {
-            super(MovConstants.BOX_TYPE_FTYP);
+            super(Mp4.BOX_TYPE_FTYP);
         }
 
         override protected function init():void

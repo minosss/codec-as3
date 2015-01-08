@@ -58,7 +58,7 @@ package cc.minos.codec.mov {
                 offset = _rawData.position;
                 size = _rawData.readUnsignedInt();
                 type = _rawData.readUnsignedInt();
-                if( type == MovConstants.BOX_TYPE_MOOV )
+                if( type == Mp4.BOX_TYPE_MOOV )
                 {
                     var d:ByteArray = new ByteArray();
                     d.writeBytes(_rawData, offset, size);
@@ -76,7 +76,7 @@ package cc.minos.codec.mov {
             for(var i:int =0;i< moovBox.traks.length; i++)
             {
                 var trak:TrakBox = moovBox.traks[i] as TrakBox;
-                if( trak.trakType == MovConstants.TRAK_TYPE_VIDE )
+                if( trak.trakType == Mp4.TRAK_TYPE_VIDE )
                 {
                     _hasVideo = true;
                     _videoWidth = trak.stsdBox.videoWidth;
@@ -85,10 +85,9 @@ package cc.minos.codec.mov {
                     _videoSamples = trak.samples;
                     //-- video sps & pps
                     _videoConfig = trak.stsdBox.configurationData;
-                    //
                     _keyframes = trak.keyframes;
                 }
-                else if( trak.trakType == MovConstants.TRAK_TYPE_SOUN )
+                else if( trak.trakType == Mp4.TRAK_TYPE_SOUN )
                 {
                     _hasAudio = true;
                     _audioChannels = trak.stsdBox.audioChannels;
