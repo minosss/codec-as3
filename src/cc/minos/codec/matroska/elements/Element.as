@@ -17,7 +17,7 @@ package cc.minos.codec.matroska.elements {
         protected var _size:uint = 0;
         protected var _position:uint = 0;
         protected var _data:ByteArray;
-        protected var _childs:Vector.<Element>;
+        protected var _children:Vector.<Element>;
 
         //mask
         private static const SUBTR:Array = [
@@ -43,7 +43,7 @@ package cc.minos.codec.matroska.elements {
         {
             //
             this._data = bytes;
-            _childs = new Vector.<Element>();
+            _children = new Vector.<Element>();
 
             var byte:ByteArray;
             var start:uint;
@@ -63,7 +63,7 @@ package cc.minos.codec.matroska.elements {
                 //id
                 byte = new ByteArray();
                 byte.writeBytes(_data, start, len);
-                id = array2uint(byte);
+                id = toHex(byte);
                 //
                 element = getElement(id);
                 if(element)
@@ -75,14 +75,14 @@ package cc.minos.codec.matroska.elements {
                     len = getLength(_data.readUnsignedByte());
                     byte.length = 0;
                     byte.writeBytes(_data, start, len);
-                    size = getValue(byte, len);
+                    size = getSize(byte, len);
 
                     //data
                     byte.length = 0;
                     byte.writeBytes(_data, (start + len), size);
                     element.size = size;
                     element.parse(byte);
-                    _childs.push(element);
+                    _children.push(element);
                     _data.position = start + len + size;
                 }
                 else
@@ -123,15 +123,15 @@ package cc.minos.codec.matroska.elements {
         public function getChildByType(type:uint):Vector.<Element>
         {
             var elements:Vector.<Element> = new Vector.<Element>();
-            if( childs.length > 0 )
+            if( children.length > 0 )
             {
-                for(var i:int = 0; i < childs.length; i++)
+                for(var i:int = 0; i < children.length; i++)
                 {
-                    var e:Element = childs[i];
+                    var e:Element = children[i];
                     if(e.type == type)
                     {
                         elements.push(e);
-                    }else if( elements.length == 0 && e.childs.length > 0 )
+                    }else if( elements.length == 0 && e.children.length > 0 )
                     {
                         elements = e.getChildByType(type);
                         if(elements.length > 0)
@@ -160,7 +160,7 @@ package cc.minos.codec.matroska.elements {
         public function getInt():int
         {
             _data.position = 0;
-            return array2uint(_data);
+            return toHex(_data);
         }
 
         /**
@@ -177,7 +177,7 @@ package cc.minos.codec.matroska.elements {
          * @param array : ByteArray(EBML-ID)
          * @return
          */
-        protected function array2uint(array:ByteArray):uint
+        public static function toHex(array:ByteArray):uint
         {
             var s:String = "";
             for(var i:uint = 0; i < array.length; i++)
@@ -192,7 +192,7 @@ package cc.minos.codec.matroska.elements {
          * @param byte
          * @return
          */
-        protected function getLength(byte:uint):uint
+        public static function getLength(byte:uint):uint
         {
             return (8 - byte.toString(2).length) + 1;
         }
@@ -203,7 +203,7 @@ package cc.minos.codec.matroska.elements {
          * @param len
          * @return
          */
-        protected function getValue(byte:ByteArray, len:uint):int
+        public static function getSize(byte:ByteArray, len:uint):int
         {
             var val:int = 0;
             byte.position = 0;
@@ -235,9 +235,9 @@ package cc.minos.codec.matroska.elements {
             return _data;
         }
 
-        public function get childs():Vector.<Element>
+        public function get children():Vector.<Element>
         {
-            return _childs;
+            return _children;
         }
 
         public function set position(value:uint):void

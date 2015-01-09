@@ -14,21 +14,20 @@ package cc.minos.codec.matroska.elements {
 
         public function SegmentInfo()
         {
-            super(cc.minos.codec.matroska.Matroska.SEGMENT_INFO);
+            super(Matroska.SEGMENT_INFO);
         }
 
         override protected function init():void
         {
             trace('segment information: ' + toString() );
-            trace('childs: ' + childs.length);
 
-            for(var i:int = 0; i < childs.length; i++)
+            for(var i:int = 0; i < children.length; i++)
             {
-                var e:Element = childs[i];
-                if(e.type == cc.minos.codec.matroska.Matroska.SEGMENT_DURATION){
+                var e:Element = children[i];
+                if(e.type == Matroska.SEGMENT_DURATION){
                     _duration = e.getNumber();
                 }
-                else if(e.type == cc.minos.codec.matroska.Matroska.SEGMENT_TIME_CODE_SCALE)
+                else if(e.type == Matroska.SEGMENT_TIME_CODE_SCALE)
                 {
                     _timeCodeScale = e.getInt();
                 }
@@ -37,24 +36,26 @@ package cc.minos.codec.matroska.elements {
             trace('duration: ' + _duration + 'ms' );
             trace('time code scale: ' + _timeCodeScale );
 
+            trace('information end. children: ' + children.length);
+
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.SEGMENT_UID:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_FILE_NAME:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_PREV_UID:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_PREV_FILE_NAME:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_NEXT_UID:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_NEXT_FILE_NAME:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_TIME_CODE_SCALE:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_DURATION:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_TITLE:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_MUXINGAPP:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_WRITINGAPP:
-                case cc.minos.codec.matroska.Matroska.SEGMENT_DATEUTC:
+                case Matroska.SEGMENT_UID:
+                case Matroska.SEGMENT_FILE_NAME:
+                case Matroska.SEGMENT_PREV_UID:
+                case Matroska.SEGMENT_PREV_FILE_NAME:
+                case Matroska.SEGMENT_NEXT_UID:
+                case Matroska.SEGMENT_NEXT_FILE_NAME:
+                case Matroska.SEGMENT_TIME_CODE_SCALE:
+                case Matroska.SEGMENT_DURATION:
+                case Matroska.SEGMENT_TITLE:
+                case Matroska.SEGMENT_MUXINGAPP:
+                case Matroska.SEGMENT_WRITINGAPP:
+                case Matroska.SEGMENT_DATEUTC:
                     return new VarElement(type);
             }
             return super.getElement(type);

@@ -9,17 +9,18 @@ package cc.minos.codec.matroska.elements {
     public class ContentEncodings extends Element {
         public function ContentEncodings()
         {
-            super(cc.minos.codec.matroska.Matroska.CONTENT_ENCODINGS);
+            super(Matroska.CONTENT_ENCODINGS);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.CONTENT_ENCODING:
+                case Matroska.CONTENT_ENCODING:
                     return new ContentEncoding();
             }
             return super.getElement(type);
         }
+
     }
 }

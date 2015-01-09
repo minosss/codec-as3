@@ -10,14 +10,14 @@ package cc.minos.codec.matroska.elements {
 
         public function SeekHead()
         {
-            super(cc.minos.codec.matroska.Matroska.SEEK_HEAD);
+            super(Matroska.SEEK_HEAD);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.SEEK:
+                case Matroska.SEEK:
                     return new Seek();
             }
             return super.getElement(type);

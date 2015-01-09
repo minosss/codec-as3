@@ -9,18 +9,18 @@ package cc.minos.codec.matroska.elements {
     public class Cluster extends Element {
         public function Cluster()
         {
-            super(cc.minos.codec.matroska.Matroska.CLUSTER);
+            super(Matroska.CLUSTER);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.CLUSTER_TIMECODE:
-                case cc.minos.codec.matroska.Matroska.CLUSTER_POSITION:
-                case cc.minos.codec.matroska.Matroska.CLUSTER_PREV_SIZE:
-                case cc.minos.codec.matroska.Matroska.CLUSTER_BLOCK_GROUP:
-                case cc.minos.codec.matroska.Matroska.CLUSTER_SIMPLE_BLOCK:
+                case Matroska.CLUSTER_TIMECODE:
+                case Matroska.CLUSTER_POSITION:
+                case Matroska.CLUSTER_PREV_SIZE:
+                case Matroska.CLUSTER_BLOCK_GROUP:
+                case Matroska.CLUSTER_SIMPLE_BLOCK:
                     return new VarElement(type);
             }
             return super.getElement(type);

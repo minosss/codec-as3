@@ -12,8 +12,8 @@ package cc.minos.codec {
 
         function get hasVideo():Boolean;
         function get hasAudio():Boolean;
-
         function get duration():Number;
+        function get frameRate():Number;
 
         //video
         function get videoConfig():ByteArray;
@@ -22,7 +22,6 @@ package cc.minos.codec {
         function get videoHeight():Number;
         function get videoRate():Number;
 
-        function get frameRate():Number;
         //audio
         function get audioConfig():ByteArray;
         function get audioCodec():uint;
@@ -38,11 +37,10 @@ package cc.minos.codec {
         /** **/
         function decode( input:ByteArray ):ICodec;
         function encode( input:ICodec ):ByteArray;
-        function probe( input:ByteArray ):Boolean;
-
-        function getDataByFrame(frame:IFrame):ByteArray
+        function probe(input:ByteArray):Boolean
 
         /** **/
+        function getDataByFrame(frame:IFrame):ByteArray
         function export():ByteArray;
         function exportVideo():ByteArray;
         function exportAudio():ByteArray;

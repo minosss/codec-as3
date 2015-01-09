@@ -9,14 +9,14 @@ package cc.minos.codec.matroska.elements {
     public class SegmentTracks extends Element {
         public function SegmentTracks()
         {
-            super(cc.minos.codec.matroska.Matroska.TRACKS);
+            super(Matroska.TRACKS);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.TRACK_ENTRY:
+                case Matroska.TRACK_ENTRY:
                     return new TrackEntry();
             }
             return super.getElement(type);
@@ -24,8 +24,8 @@ package cc.minos.codec.matroska.elements {
 
         override protected function init():void
         {
-            trace('tracks: ' + toString() );
-
+            trace('tracks id: ' + toString() , 'size: ' + size );
+            trace('tracks end. children: ' + children.length );
         }
     }
 }

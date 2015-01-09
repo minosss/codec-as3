@@ -13,15 +13,15 @@ package cc.minos.codec.matroska.elements {
 
         public function Seek()
         {
-            super(cc.minos.codec.matroska.Matroska.SEEK);
+            super(Matroska.SEEK);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.SEEK_ID:
-                case cc.minos.codec.matroska.Matroska.SEEK_POSITION:
+                case Matroska.SEEK_ID:
+                case Matroska.SEEK_POSITION:
                     return new VarElement(type);
             }
             return super.getElement(type);
@@ -29,10 +29,10 @@ package cc.minos.codec.matroska.elements {
 
         override protected function init():void
         {
-            if(childs.length == 2)
+            if(children.length == 2)
             {
-                _seekId = array2uint(childs[0].data);
-                _seekPosition = array2uint(childs[1].data);
+                _seekId = toHex(children[0].data);
+                _seekPosition = toHex(children[1].data);
             }
         }
 

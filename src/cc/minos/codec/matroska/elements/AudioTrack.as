@@ -9,17 +9,17 @@ package cc.minos.codec.matroska.elements {
     public class AudioTrack extends Element {
         public function AudioTrack()
         {
-            super(cc.minos.codec.matroska.Matroska.TRACK_AUDIO);
+            super(Matroska.TRACK_AUDIO);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.AUDIO_SAMPLING_FREQUENCY:   //Hz
-                case cc.minos.codec.matroska.Matroska.AUDIO_OUTPUT_SAMPLING_FREQUENCY:
-                case cc.minos.codec.matroska.Matroska.AUDIO_CHANNELS:  //
-                case cc.minos.codec.matroska.Matroska.AUDIO_BIT_DEPTH: //
+                case Matroska.AUDIO_SAMPLING_FREQUENCY:   //Hz
+                case Matroska.AUDIO_OUTPUT_SAMPLING_FREQUENCY:
+                case Matroska.AUDIO_CHANNELS:  //
+                case Matroska.AUDIO_BIT_DEPTH: //
                     return new VarElement(type);
             }
             return super.getElement(type);
@@ -28,10 +28,10 @@ package cc.minos.codec.matroska.elements {
         override protected function init():void
         {
             trace('audio track');
-            trace('sampling frequency: ' + getChildByType(cc.minos.codec.matroska.Matroska.AUDIO_SAMPLING_FREQUENCY)[0].getNumber() + 'kHz')
-            trace('channels: ' + getChildByType(cc.minos.codec.matroska.Matroska.AUDIO_CHANNELS)[0].getInt());
-            trace('bit depth: ' + getChildByType(cc.minos.codec.matroska.Matroska.AUDIO_BIT_DEPTH)[0].getInt() + 'bit' );
-            trace('childs: ' + childs.length);
+            trace('sampling frequency: ' + getChildByType(Matroska.AUDIO_SAMPLING_FREQUENCY)[0].getNumber() + 'kHz')
+            trace('channels: ' + getChildByType(Matroska.AUDIO_CHANNELS)[0].getInt());
+            trace('bit depth: ' + getChildByType(Matroska.AUDIO_BIT_DEPTH)[0].getInt() + 'bit' );
+            trace('childs: ' + children.length);
         }
     }
 }

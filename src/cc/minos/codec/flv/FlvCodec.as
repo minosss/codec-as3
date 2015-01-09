@@ -256,6 +256,7 @@ package cc.minos.codec.flv {
 			_rawData = input;
 			_rawData.position = 0;
 
+			_rawData.readUTFBytes(3); // FLV
 			_rawData.readByte(); //version
 			var info:uint = _rawData.readByte(); //flags
 			_hasAudio = (info >> 2 & 0x1); //audio
@@ -280,31 +281,38 @@ package cc.minos.codec.flv {
 				currentTag = _rawData.readByte();
 				step = (_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte();
 				time = (_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte();
-				timestampExtended = _rawData.readUnsignedByte();
+				timestampExtended = _rawData.readUnsignedByte(); //
 				streamID = ((_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte());
 				bodyTagHeader = _rawData.readUnsignedByte();
 				end = _rawData.position + step + 3;
 				tagLength = end - offset;
 
-				if (currentTag == Flv.TAG_TYPE_META || currentTag == Flv.TAG_TYPE_AUDIO || currentTag == Flv.TAG_TYPE_VIDEO)
+				if ( currentTag == Flv.TAG_TYPE_META || currentTag == Flv.TAG_TYPE_AUDIO || currentTag == Flv.TAG_TYPE_VIDEO)
 				{
 					frame = new FlvFrame();
 					frame.dataType = currentTag;
 					frame.offset = offset;
 					frame.size = tagLength;
+					frame.timestamp = time;
 					if (currentTag == Flv.TAG_TYPE_VIDEO)
 					{
 						frame.frameType = (bodyTagHeader >> 4); //key or inter ...
 						frame.codecId = (bodyTagHeader & 0xf);//avc... etc
+						//if avc -> pps & sps
 					}
 					else if (currentTag == Flv.TAG_TYPE_AUDIO)
 					{
 						frame.frameType = bodyTagHeader; //
 						frame.codecId = (bodyTagHeader >> 4); //aac... etc
+						//if aac -> codec specs ...
 //                    (bodyTagHeader >> 4); //sound format 0-15
 //                    (bodyTagHeader >> 2 & 0x03 ); //sound rate 0/1/2/3(5.5/11/22/44-kHz)
 //                    (bodyTagHeader >> 1 & 0x1 ); //sound size 0/1(8b/16b)
 //                    (bodyTagHeader & 0x1 ); //sound type 0/1
+					}
+					else if ( currentTag == Flv.TAG_TYPE_META )
+					{
+						//parse meta data -> video params
 					}
 					_frames.push(frame);
 				}

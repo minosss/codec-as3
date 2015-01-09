@@ -16,8 +16,7 @@ package cc.minos.codec.matroska.elements {
         override public function parse(bytes:ByteArray):void
         {
             _data = bytes;
-            _childs = new Vector.<Element>();
-
+            _children = new Vector.<Element>();
         }
     }
 }
