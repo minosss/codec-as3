@@ -8,7 +8,6 @@ package cc.minos.codec.matroska.elements {
     import cc.minos.codec.matroska.Matroska;
 
     import com.hurlant.math.BigInteger;
-    import com.hurlant.util.Hex;
 
     import flash.utils.ByteArray;
 
@@ -109,8 +108,8 @@ package cc.minos.codec.matroska.elements {
         protected function getElement(type:uint):Element
         {
             switch(type){
-                case cc.minos.codec.matroska.Matroska.VOID:
-                case cc.minos.codec.matroska.Matroska.CRC_32:
+                case Matroska.VOID:
+                case Matroska.CRC_32:
                     return new GlobalElement(type);
             }
             return null;
@@ -206,12 +205,12 @@ package cc.minos.codec.matroska.elements {
          */
         protected function getValue(byte:ByteArray, len:uint):int
         {
+            var val:int = 0;
             byte.position = 0;
             var valu:BigInteger = new BigInteger(byte, 0, true);
             var mask:BigInteger = SUBTR[len - 1];
-//            trace(valu.toString());
-//            trace(mask.toString());
-            return valu.and(mask).intValue();
+            val = valu.and(mask).intValue();
+            return val;
         }
 
         //

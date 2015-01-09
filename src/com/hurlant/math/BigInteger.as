@@ -12,10 +12,8 @@
 package com.hurlant.math
 {
 
-	import com.hurlant.crypto.prng.Random;
 	import com.hurlant.util.Hex;
-	import com.hurlant.util.Memory;
-	
+
 	import flash.utils.ByteArray;
 	use namespace bi_internal;
 
@@ -57,7 +55,7 @@ package com.hurlant.math
 				fromArray(array, length, unsigned);
 			}
 		}
-		public function dispose():void {
+		/*public function dispose():void {
 			var r:Random = new Random;
 			for (var i:uint=0;i<a.length;i++) {
 				a[i] = r.nextByte();
@@ -67,7 +65,7 @@ package com.hurlant.math
 			t=0;
 			s=0;
 			Memory.gc();
-		}
+		}*/
 		
 		public function toString(radix:Number=16):String {
 			if (s<0) return "-"+negate().toString(radix);
@@ -235,7 +233,7 @@ package com.hurlant.math
 		/**
 		 * this^e % m, 0 <= e < 2^32
 		 */
-		public function modPowInt(e:int, m:BigInteger):BigInteger {
+		/*public function modPowInt(e:int, m:BigInteger):BigInteger {
 			var z:IReduction;
 			if (e<256 || m.isEven()) {
 				z = new ClassicReduction(m);
@@ -243,7 +241,7 @@ package com.hurlant.math
 				z = new MontgomeryReduction(m);
 			}
 			return exp(e, z);
-		}
+		}*/
 
 		/**
 		 * copy this to r
@@ -586,7 +584,7 @@ package com.hurlant.math
 		/**
 		 * this^e, e < 2^32, doing sqr and mul with "r" (HAC 14.79)
 		 */
-		bi_internal function exp(e:int, z:IReduction):BigInteger {
+		/*bi_internal function exp(e:int, z:IReduction):BigInteger {
 			if (e > 0xffffffff || e < 1) return ONE;
 			var r:BigInteger = nbi();
 			var r2:BigInteger = nbi();
@@ -605,7 +603,7 @@ package com.hurlant.math
 				
 			}
 			return z.revert(r);
-		}
+		}*/
 		bi_internal function intAt(str:String, index:int):int {
 			return parseInt(str.charAt(index), 36);
 		}
@@ -1153,9 +1151,9 @@ package com.hurlant.math
 		 * @return this^e
 		 * 
 		 */
-		public function pow(e:int):BigInteger {
+		/*public function pow(e:int):BigInteger {
 			return exp(e, new NullReduction);
-		}
+		}*/
 		
 		/**
 		 * 
@@ -1209,7 +1207,7 @@ package com.hurlant.math
 		 * @return this^e % m (HAC 14.85)
 		 * 
 		 */
-		public function modPow(e:BigInteger, m:BigInteger):BigInteger {
+		/*public function modPow(e:BigInteger, m:BigInteger):BigInteger {
 			var i:int = e.bitLength();
 			var k:int;
 			var r:BigInteger = nbv(1);
@@ -1306,7 +1304,7 @@ package com.hurlant.math
 				}
 			}
 			return z.revert(r);
-		}
+		}*/
 		
 		/**
 		 * 
@@ -1455,7 +1453,7 @@ package com.hurlant.math
 		 * @return primality with certainty >= 1-.5^t
 		 * 
 		 */
-		public function isProbablePrime(t:int):Boolean {
+		/*public function isProbablePrime(t:int):Boolean {
 			var i:int;
 			var x:BigInteger = abs();
 			if (x.t == 1 && x.a[0]<=lowprimes[lowprimes.length-1]) {
@@ -1480,7 +1478,7 @@ package com.hurlant.math
 				}
 			}
 			return x.millerRabin(t);
-		}
+		}*/
 		
 		/**
 		 * 
@@ -1488,7 +1486,7 @@ package com.hurlant.math
 		 * @return true if probably prime (HAC 4.24, Miller-Rabin)
 		 * 
 		 */
-		protected function millerRabin(t:int):Boolean {
+		/*protected function millerRabin(t:int):Boolean {
 			var n1:BigInteger = subtract(BigInteger.ONE);
 			var k:int = n1.getLowestSetBit();
 			if (k<=0) {
@@ -1517,7 +1515,7 @@ package com.hurlant.math
 				}
 			}
 			return true;
-		}
+		}*/
 
 		/**
 		 * Tweak our BigInteger until it looks prime enough
@@ -1526,7 +1524,7 @@ package com.hurlant.math
 		 * @param t
 		 * 
 		 */
-		public function primify(bits:int, t:int):void {
+		/*public function primify(bits:int, t:int):void {
 			if (!testBit(bits-1)) {	// force MSB set
 				bitwiseTo(BigInteger.ONE.shiftLeft(bits-1), op_or, this);
 			}
@@ -1537,7 +1535,7 @@ package com.hurlant.math
 				dAddOffset(2,0);
 				while(bitLength()>bits) subTo(BigInteger.ONE.shiftLeft(bits-1),this);
 			}
-		}
+		}*/
 
 	}
 }

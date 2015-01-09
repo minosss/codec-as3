@@ -50,32 +50,20 @@ package cc.minos.codec.utils {
             return true;
         }
 
-        /*public static function writeUI24(stream:*, p:uint):void
-        {
-            var byte1:int = p >> 16;
-            var byte2:int = p >> 8 & 0xff;
-            var byte3:int = p & 0xff;
-            stream.writeByte(byte1);
-            stream.writeByte(byte2);
-            stream.writeByte(byte3);
+        public static function toString( hex:String ):String {
+            var a:ByteArray = toArray(hex);
+            return a.readUTFBytes(a.length);
         }
-        public static function writeUI16(stream:*, p:uint):void
-        {
-            stream.writeByte( p >> 8 )
-            stream.writeByte( p & 0xff );
+
+        public static function toArray( hex:String ):ByteArray {
+            hex = hex.replace(/\s|:/gm,'');
+            var a:ByteArray = new ByteArray;
+            if ((hex.length&1)==1) hex="0"+hex;
+            for (var i:uint=0;i<hex.length;i+=2) {
+                a[i/2] = parseInt(hex.substr(i,2),16);
+            }
+            return a;
         }
-        public static function writeUI4_12(stream:*, p1:uint, p2:uint):void
-        {
-            // writes a 4-bit value followed by a 12-bit value in a total of 2 bytes
-
-            var byte1a:int = p1 << 4;
-            var byte1b:int = p2 >> 8;
-            var byte1:int = byte1a + byte1b;
-            var byte2:int = p2 & 0xff;
-
-            stream.writeByte(byte1);
-            stream.writeByte(byte2);
-        }*/
 
     }
 }
