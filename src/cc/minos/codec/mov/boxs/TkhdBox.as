@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/11 16:19
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.Mp4;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.Mov;
     import cc.minos.codec.utils.SimpleDateFormatter;
 
     public class TkhdBox extends Box {
@@ -20,7 +20,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function TkhdBox()
         {
-            super(Mp4.BOX_TYPE_TKHD);
+            super(Mov.BOX_TYPE_TKHD);
         }
 
         override protected function init():void
@@ -57,14 +57,14 @@ package cc.minos.codec.mp4.boxs {
             trace('layer: ' + data.readShort() );
             trace('group: ' + data.readShort() );
 
-            _volume = data.readShort() / Mp4.FIXED_POINT_8_8;
+            _volume = data.readShort() / Mov.FIXED_POINT_8_8;
 //            trace('volume: ' + data.readShort() / 256.0 );
             trace('reserved: ' + data.readShort() );
 
             data.position += 36;
 
-            _width = data.readInt() / Mp4.FIXED_POINT_16_16;
-            _height = data.readInt() / Mp4.FIXED_POINT_16_16;
+            _width = data.readInt() / Mov.FIXED_POINT_16_16;
+            _height = data.readInt() / Mov.FIXED_POINT_16_16;
 
             trace('width: ' + _width );
             trace('height: ' + _height );

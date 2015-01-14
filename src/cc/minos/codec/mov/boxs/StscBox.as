@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/10 14:55
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.Mp4;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.Mov;
 
     /**
      * sample to chunk
@@ -16,7 +16,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function StscBox()
         {
-            super(Mp4.BOX_TYPE_STSC);
+            super(Mov.BOX_TYPE_STSC);
         }
 
         override protected function init():void

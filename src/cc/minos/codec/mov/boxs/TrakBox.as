@@ -3,10 +3,10 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/8 17:53
  */
-package cc.minos.codec.mp4.boxs {
+package cc.minos.codec.mov.boxs {
 
-    import cc.minos.codec.mp4.Mp4;
-    import cc.minos.codec.mp4.Sample;
+    import cc.minos.codec.mov.Mov;
+    import cc.minos.codec.mov.Sample;
 
     import flash.utils.ByteArray;
 
@@ -25,16 +25,16 @@ package cc.minos.codec.mp4.boxs {
 
         public function TrakBox()
         {
-            super( Mp4.BOX_TYPE_TRAK );
+            super( Mov.BOX_TYPE_TRAK );
         }
 
         override protected function init():void
         {
             //type
-            _hdlrBox = getBox(Mp4.BOX_TYPE_HDLR).shift() as HdlrBox;
-            _mdhdBox = getBox(Mp4.BOX_TYPE_MDHD).shift() as MdhdBox;
-            _tkhdBox = getBox(Mp4.BOX_TYPE_TKHD).shift() as TkhdBox;
-            _stblBox = getBox(Mp4.BOX_TYPE_STBL).shift() as StblBox;
+            _hdlrBox = getBox(Mov.BOX_TYPE_HDLR).shift() as HdlrBox;
+            _mdhdBox = getBox(Mov.BOX_TYPE_MDHD).shift() as MdhdBox;
+            _tkhdBox = getBox(Mov.BOX_TYPE_TKHD).shift() as TkhdBox;
+            _stblBox = getBox(Mov.BOX_TYPE_STBL).shift() as StblBox;
 
             for each(var sample:Sample in _stblBox.samples )
             {

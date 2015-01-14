@@ -3,9 +3,9 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/15 10:43
  */
-package cc.minos.codec.mp4.boxs {
+package cc.minos.codec.mov.boxs {
 
-    import cc.minos.codec.mp4.Mp4;
+    import cc.minos.codec.mov.Mov;
     import cc.minos.codec.utils.ByteArrayUtil;
 
     import flash.utils.ByteArray;
@@ -26,7 +26,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function StsdBox()
         {
-            super(Mp4.BOX_TYPE_STSD);
+            super(Mov.BOX_TYPE_STSD);
         }
 
         override protected function decode():void
@@ -44,7 +44,7 @@ package cc.minos.codec.mp4.boxs {
             _configurationData = new ByteArray();
             var offset:uint;
             var len:uint;
-            if( codecType == Mp4.BOX_TYPE_AVC1 )
+            if( codecType == Mov.BOX_TYPE_AVC1 )
             {
                 //6 reserved
                 data.position += 6;
@@ -105,7 +105,7 @@ package cc.minos.codec.mp4.boxs {
                 _configurationData.writeBytes( data, offset, data.bytesAvailable );
 
             }
-            else if(codecType == Mp4.BOX_TYPE_MP4A )
+            else if(codecType == Mov.BOX_TYPE_MP4A )
             {
                 //6 reserved
                 data.position += 6;
@@ -128,7 +128,7 @@ package cc.minos.codec.mp4.boxs {
                 //2 audio packet size 0
                 data.readShort();
                 //4 audio sample rate
-                _audioRate = data.readUnsignedInt() / Mp4.FIXED_POINT_16_16
+                _audioRate = data.readUnsignedInt() / Mov.FIXED_POINT_16_16
                 trace('rate: ' + _audioRate );
 
                 //========= ESDS | M4DS ==========

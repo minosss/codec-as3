@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/8 17:31
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.Mp4;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.Mov;
 
     public class MoovBox extends Box {
 
@@ -13,14 +13,14 @@ package cc.minos.codec.mp4.boxs {
 
         public function MoovBox()
         {
-            super( Mp4.BOX_TYPE_MOOV );
+            super( Mov.BOX_TYPE_MOOV );
         }
 
         override protected function init():void
         {
             trace('moov ======' );
-            _mvhdBox = getBox( Mp4.BOX_TYPE_MVHD ).shift() as MvhdBox;
-            _traks = getBox( Mp4.BOX_TYPE_TRAK );
+            _mvhdBox = getBox( Mov.BOX_TYPE_MVHD ).shift() as MvhdBox;
+            _traks = getBox( Mov.BOX_TYPE_TRAK );
 
             trace('streams: ' + _traks.length );
         }

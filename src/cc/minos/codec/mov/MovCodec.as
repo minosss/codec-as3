@@ -3,23 +3,23 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/24 15:36
  */
-package cc.minos.codec.mp4 {
+package cc.minos.codec.mov {
 
 	import cc.minos.codec.*;
-	import cc.minos.codec.mp4.boxs.*;
+	import cc.minos.codec.mov.boxs.*;
 
 	import flash.utils.ByteArray;
 
-	public class Mp4Codec extends Codec {
+	public class MovCodec extends Codec {
 
 		protected var moovBox:MoovBox;
 		protected var _videoSamples:Vector.<Sample>;
 		protected var _audioSamples:Vector.<Sample>;
 
-		public function Mp4Codec()
+		public function MovCodec()
 		{
-			_name = "mp4,f4v";
-			_extensions = "mp4,f4v";
+			_name = "mp4,f4v,mov";
+			_extensions = "mp4,f4v,mov";
 			_mimeType = "application/mp4,application/f4v";
 		}
 
@@ -60,7 +60,7 @@ package cc.minos.codec.mp4 {
 				offset = _rawData.position;
 				size = _rawData.readUnsignedInt();
 				type = _rawData.readUnsignedInt();
-				if (type == Mp4.BOX_TYPE_MOOV)
+				if (type == Mov.BOX_TYPE_MOOV)
 				{
 					var d:ByteArray = new ByteArray();
 					d.writeBytes(_rawData, offset, size);
@@ -78,7 +78,7 @@ package cc.minos.codec.mp4 {
 			for (var i:int = 0; i < moovBox.traks.length; i++)
 			{
 				var trak:TrakBox = moovBox.traks[i] as TrakBox;
-				if (trak.trakType == Mp4.TRAK_TYPE_VIDE)
+				if (trak.trakType == Mov.TRAK_TYPE_VIDE)
 				{
 					_hasVideo = true;
 					_videoWidth = trak.stsdBox.videoWidth;
@@ -89,7 +89,7 @@ package cc.minos.codec.mp4 {
 					_videoConfig = trak.stsdBox.configurationData;
 					_keyframes = trak.keyframes;
 				}
-				else if (trak.trakType == Mp4.TRAK_TYPE_SOUN)
+				else if (trak.trakType == Mov.TRAK_TYPE_SOUN)
 				{
 					_hasAudio = true;
 					_audioChannels = trak.stsdBox.audioChannels;

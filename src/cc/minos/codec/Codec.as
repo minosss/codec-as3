@@ -7,7 +7,7 @@ package cc.minos.codec {
 
 	import cc.minos.codec.flv.FlvCodec;
 	import cc.minos.codec.matroska.MatroskaCodec;
-	import cc.minos.codec.mp4.Mp4Codec;
+	import cc.minos.codec.mov.MovCodec;
 
 	import flash.utils.ByteArray;
 
@@ -238,14 +238,14 @@ package cc.minos.codec {
 
 		/**
 		 *
-		 * @param input : ByteArray. raw data
+		 * @param input
 		 * @return
 		 */
 		public static function decode( input:ByteArray ):ICodec
 		{
 			var c:ICodec;
 			if (input[4] == 0x66 && input[5] == 0x74 && input[6] == 0x79 && input[7] == 0x70) //FTYP
-				c = new Mp4Codec();
+				c = new MovCodec();
 			else if (input[0] == 0x1A && input[1] == 0x45 && input[2] == 0xDF && input[3] == 0xA3) //EBML
 				c = new MatroskaCodec();
 			else

@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/10 14:16
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.Mp4;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.Mov;
 
     public class HdlrBox extends Box {
 
@@ -12,17 +12,17 @@ package cc.minos.codec.mp4.boxs {
 
         public function HdlrBox()
         {
-            super(Mp4.BOX_TYPE_HDLR);
+            super(Mov.BOX_TYPE_HDLR);
         }
 
         override protected function init():void
         {
             data.position = 16;
             _hdType = data.readUnsignedInt();
-            if( _hdType === Mp4.TRAK_TYPE_VIDE )
+            if( _hdType === Mov.TRAK_TYPE_VIDE )
             {
             }
-            else if( _hdType === Mp4.TRAK_TYPE_SOUN )
+            else if( _hdType === Mov.TRAK_TYPE_SOUN )
             {
             }
         }
