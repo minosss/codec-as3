@@ -155,7 +155,7 @@ package cc.minos.codec.flv {
 		{
 			var tag:ByteArray = new ByteArray();
 			byte_w8(tag, Flv.TAG_TYPE_VIDEO); //tag type
-			byte_wb24(tag, data.length + flagsSize); //data size
+			byte_wb24(tag, data.length + flagsSize ); //data size
 			byte_wb24(tag, timestamp); //ts
 			byte_w8(tag, 0); //ts ext
 			byte_wb24(tag, 0); //stream id
@@ -165,7 +165,7 @@ package cc.minos.codec.flv {
 			byte_wb24(tag, 0); //ct
 			tag.writeBytes(data);
 			//save the keyframe information
-			if (frameType == Flv.VIDEO_FRAME_KEY)
+			if (frameType == Flv.VIDEO_FRAME_KEY && keyframesList )
 			{
 				keyframesList.push({'time': parseFloat((timestamp / 1000).toFixed(2)), 'position': s.position});
 			}
@@ -179,7 +179,7 @@ package cc.minos.codec.flv {
 		{
 			var tag:ByteArray = new ByteArray();
 			byte_w8(tag, Flv.TAG_TYPE_AUDIO);
-			byte_wb24(tag, data.length + flagsSize);
+			byte_wb24(tag, data.length + flagsSize );
 			byte_wb24(tag, timestamp); //ts
 			byte_w8(tag, 0); //ts ext
 			byte_wb24(tag, 0); //stream
@@ -224,13 +224,13 @@ package cc.minos.codec.flv {
 			for (var i:int = 0; i < input.frames.length; i++)
 			{
 				var f:IFrame = input.frames[i];
-				if (f.dataType == Flv.TAG_TYPE_VIDEO)
+				if ( input.hasVideo && f.dataType == Flv.TAG_TYPE_VIDEO )
 					byte_video(ba, input.getDataByFrame(f), f.timestamp, f.frameType, Flv.VIDEO_CODECID_H264);
-				else
+				else if( input.hasAudio && f.dataType == Flv.TAG_TYPE_AUDIO )
 					byte_audio(ba, input.getDataByFrame(f), f.timestamp, flags);
 			}
 			//update meta's keyframes
-			if (keyframesList && keyframesList.length > 0)
+			if ( keyframesList && keyframesList.length > 0)
 			{
 				ba.position = timesPos;
 				for (var k:uint = 0; k < keyframesList.length; k++)
