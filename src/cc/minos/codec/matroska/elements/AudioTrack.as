@@ -7,6 +7,7 @@ package cc.minos.codec.matroska.elements {
     import cc.minos.codec.matroska.Matroska;
 
     public class AudioTrack extends Element {
+
         public function AudioTrack()
         {
             super(Matroska.TRACK_AUDIO);

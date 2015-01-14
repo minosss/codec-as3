@@ -124,6 +124,9 @@ package cc.minos.codec.matroska {
         public static const CUES_CUE_POINT:uint = 0xBB;
         public static const POINT_CUE_TIME:uint = 0xB3;
         public static const POINT_CUE_TRACK_POSITIONS:uint = 0xB7;
+        public static const CUE_TRACK:uint = 0xF7;
+        public static const CUE_CLUSTER_POSITION:uint = 0xF1;
+        public static const CUE_BLOCK_NUMBER:uint = 0x5378;
 
         /**
          * the attachments elements contains all files attached to this segment.

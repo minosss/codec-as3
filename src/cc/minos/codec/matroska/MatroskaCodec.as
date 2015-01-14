@@ -7,9 +7,12 @@ package cc.minos.codec.matroska {
 
     import cc.minos.codec.Codec;
     import cc.minos.codec.ICodec;
+    import cc.minos.codec.IFrame;
+    import cc.minos.codec.matroska.elements.Cluster;
     import cc.minos.codec.matroska.elements.EbmlHeader;
     import cc.minos.codec.matroska.elements.Element;
     import cc.minos.codec.matroska.elements.Segment;
+    import cc.minos.codec.matroska.elements.TrackEntry;
 
     import flash.utils.ByteArray;
 
@@ -62,7 +65,62 @@ package cc.minos.codec.matroska {
                 _rawData.position += size;
             }
 
+            if( !ebml || !segment ){
+            }
+
+            //frames
+            var clusters:Vector.<Element> = segment.getChildByType(Matroska.CLUSTER);
+
+            if( clusters != null )
+            {
+                for(var i:int =0;i<clusters.length;i++)
+                {
+                    for(var j:uint = 0; j < Cluster(clusters[i]).frames.length; j++ )
+                    {
+                        _frames.push(Cluster(clusters[i]).frames[j]);
+                    }
+                }
+            }
+
+//            trace('frames: ' + _frames.length );  //video & audio frame
+
+            //tracks
+            var tracks:Vector.<Element> = segment.getChildByType(Matroska.TRACK_ENTRY);
+            if( tracks )
+            {
+                for(var j:uint =0;j<tracks.length; j++)
+                {
+                    var track:TrackEntry = tracks[j] as TrackEntry;
+                    if( track.trackType == 1 )
+                    {
+                        _hasVideo = true;
+                        _videoWidth = track.videoWidth;
+                        _videoHeight = track.videoHeight;
+
+                        _videoConfig = new ByteArray();
+                        _videoConfig.writeBytes(frames.shift()['data']);
+                        trace('videoConfig: ' + _videoConfig.length );
+                    }
+                    else if( track.trackType == 2 )
+                    {
+                        _audioChannels = 2;
+                        _hasAudio = true;
+//                        _audioConfig = track.configurationData;
+                    }
+                }
+            }
+
+            _frameRate = 25;
+            _duration = segment.info.duration / 1000;
+
             return this;
+        }
+
+        override public function getDataByFrame(frame:IFrame):ByteArray
+        {
+            if(frame is MatroskaFrame)
+                return MatroskaFrame(frame).data;
+            return null;
         }
 
         private function step():ByteArray

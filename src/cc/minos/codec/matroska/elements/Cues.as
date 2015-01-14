@@ -25,6 +25,10 @@ package cc.minos.codec.matroska.elements {
         override protected function init():void
         {
             trace('cues: ' + toString() );
+            trace('children: ' + children.length );
+//            trace((children[0].children[0].getInt()));
+//            trace(toHex(children[0].children[1].children[0].data)); //track number
+//            trace((children[0].children[1].children[1].getInt()));
         }
     }
 }

@@ -131,7 +131,7 @@ package cc.minos.codec.matroska.elements {
                     if(e.type == type)
                     {
                         elements.push(e);
-                    }else if( elements.length == 0 && e.children.length > 0 )
+                    }else if( elements.length == 0 && e.children && e.children.length > 0 )
                     {
                         elements = e.getChildByType(type);
                         if(elements.length > 0)

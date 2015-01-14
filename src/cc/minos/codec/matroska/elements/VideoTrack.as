@@ -7,6 +7,10 @@ package cc.minos.codec.matroska.elements {
     import cc.minos.codec.matroska.Matroska;
 
     public class VideoTrack extends Element {
+
+        private var _width:uint;
+        private var _height:uint;
+
         public function VideoTrack()
         {
             super(Matroska.TRACK_VIDEO);
@@ -33,9 +37,21 @@ package cc.minos.codec.matroska.elements {
         override protected function init():void
         {
             trace('video track');
-            trace('width: ' + getChildByType(Matroska.VIDEO_DISPLAY_WIDTH)[0].getInt());
-            trace('height: ' + getChildByType(Matroska.VIDEO_DISPLAY_HEIGHT)[0].getInt());
+            _width = getChildByType(Matroska.VIDEO_DISPLAY_WIDTH)[0].getInt();
+            _height = getChildByType(Matroska.VIDEO_DISPLAY_HEIGHT)[0].getInt();
+            trace('width: ' + _width);
+            trace('height: ' + _height);
             trace('children: ' + children.length);
+        }
+
+        public function get width():uint
+        {
+            return _width;
+        }
+
+        public function get height():uint
+        {
+            return _height;
         }
     }
 }
