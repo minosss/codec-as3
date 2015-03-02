@@ -6,7 +6,6 @@
 package cc.minos.codec.flv {
 
 	import cc.minos.codec.*;
-
 	import flash.utils.ByteArray;
 
 	/**
@@ -16,8 +15,10 @@ package cc.minos.codec.flv {
 	 */
 	public class FlvCodec extends Codec {
 
+		//记录meta关键帧数据位置
 		private var filepositionsPos:uint;
 		private var timesPos:uint;
+		//关键帧列表（时间，位移）
 		private var keyframesList:Array;
 
 		public function FlvCodec()
@@ -26,6 +27,8 @@ package cc.minos.codec.flv {
 			_extensions = "flv";
 			_mimeType = "video/x-flv";
 		}
+
+		/* byte_数据类型 写入数据的方法 */
 
 		protected function byte_string(s:*, str:String):void
 		{
@@ -45,9 +48,15 @@ package cc.minos.codec.flv {
 			s.writeDouble(num);
 		}
 
+		/**
+		 * 写入flv的文件头
+		 * @param s		:	输出流
+		 * @param input	:	输入数据
+		 */
 		protected function byte_header(s:*, input:ICodec):void
 		{
 			var d:ByteArray = new ByteArray();
+			//开头固定的3个字节
 			byte_w8(d, 0x46); //F
 			byte_w8(d, 0x4C); //L
 			byte_w8(d, 0x56); //V
@@ -60,6 +69,7 @@ package cc.minos.codec.flv {
 			byte_wb32(d, 0);
 			//meta tag
 			byte_w8(d, Flv.TAG_TYPE_META);
+			//先记录数据大小的位置稍后更新
 			var metadataSizePos:uint = d.position;
 			byte_wb24(d, 0);  //data size
 			byte_wb24(d, 0); //ts
@@ -70,6 +80,7 @@ package cc.minos.codec.flv {
 			byte_string(d, 'onMetaData');
 			byte_w8(d, Flv.AMF_DATA_TYPE_MIXEDARRAY);
 
+			//先记录参数个数的位置稍后更新
 			var metadataCountPos:uint = d.position;
 			var metadataCount:uint = 2;
 			byte_wb32(d, metadataCount);
@@ -102,6 +113,12 @@ package cc.minos.codec.flv {
 				var _hasKey:Boolean = (input.keyframes != null);
 				if (_hasKey)
 				{
+					/**
+					 * 写入关键帧
+					 * 关键帧数据是一个对象，其中包含2个数组（时间，位移）
+					 * 这里都先用0占位，在加入完帧后更新
+					 */
+
 					keyframesList = [];
 
 					byte_string(d, 'hasKeyframes');
@@ -138,7 +155,7 @@ package cc.minos.codec.flv {
 			}
 			byte_wb24(d, Flv.AMF_END_OF_OBJECT);
 
-			//update
+			//更新meta的数据
 			d.position = metadataCountPos;
 			byte_wb32(d, metadataCount);
 			d.position = metadataSizePos;
@@ -151,6 +168,16 @@ package cc.minos.codec.flv {
 			d.length = 0, d = null;
 		}
 
+		/**
+		 * 写入视频节点
+		 * @param s			:	目标流
+		 * @param data		:	数据
+		 * @param timestamp :	时间戳
+		 * @param frameType :	帧类型，占4位（1是关键帧，2则不是）
+		 * @param codecId	:	编码类型，占后4位（7则是avc）
+		 * @param naluType	:	NALU类型，avc的数据开始需要NALU header 0后续都是1
+		 * @param flagsSize	:	数据头标签占位
+		 */
 		protected function byte_video(s:*, data:ByteArray, timestamp:Number, frameType:uint, codecId:uint, naluType:uint = 1, flagsSize:uint = 5):void
 		{
 			var tag:ByteArray = new ByteArray();
@@ -175,6 +202,15 @@ package cc.minos.codec.flv {
 			tag.length = 0, tag = null;
 		}
 
+		/**
+		 * 音频流节点
+		 * @param s			:	目标流
+		 * @param data		:	数据
+		 * @param timestamp	:	时间戳
+		 * @param prop		:	音频标识（类型，赫兹，声道等）
+		 * @param packetType:	类型AAC一样需要分header0和body1
+		 * @param flagsSize	:	标签头占位
+		 */
 		protected function byte_audio(s:*, data:ByteArray, timestamp:Number, prop:uint, packetType:uint = 1, flagsSize:uint = 2):void
 		{
 			var tag:ByteArray = new ByteArray();
@@ -194,6 +230,12 @@ package cc.minos.codec.flv {
 			tag.length = 0, tag = null;
 		}
 
+		/**
+		 * 音频标记
+		 * 这里固定成AAC
+		 * @param input
+		 * @return
+		 */
 		protected function getAudioFlags(input:ICodec):uint
 		{
 			var _soundPropertiesByte:uint = 0;
@@ -204,23 +246,32 @@ package cc.minos.codec.flv {
 			return _soundPropertiesByte;
 		}
 
+		/**
+		 * 封装
+		 * 将其他类型的封装重新封装成flv
+		 * @param input
+		 * @return
+		 */
 		override public function encode(input:ICodec):ByteArray
 		{
 			var ba:ByteArray = new ByteArray();
 
+			//文件头
 			byte_header(ba, input);
-
+			//这里是pps和sps，avc重要的组成部分，在文件的开头meta的后面，一定是关键帧
 			if (input.videoConfig)
 			{
 				byte_video(ba, input.videoConfig, 0, Flv.VIDEO_FRAME_KEY, Flv.VIDEO_CODECID_H264, 0);
 			}
 
+			//音频解析的部分，接着视频的解析数据
 			var flags:uint = getAudioFlags(input);
 			if (input.audioConfig)
 			{
 				byte_audio(ba, input.audioConfig, 0, flags, 0);
 			}
 
+			//根据时间添加各个节点
 			for (var i:int = 0; i < input.frames.length; i++)
 			{
 				var f:IFrame = input.frames[i];
@@ -229,7 +280,8 @@ package cc.minos.codec.flv {
 				else if( input.hasAudio && f.dataType == Flv.TAG_TYPE_AUDIO )
 					byte_audio(ba, input.getDataByFrame(f), f.timestamp, flags);
 			}
-			//update meta's keyframes
+
+			//根据获取到的关键帧数组，更新meta的数据
 			if ( keyframesList && keyframesList.length > 0)
 			{
 				ba.position = timesPos;
@@ -248,6 +300,11 @@ package cc.minos.codec.flv {
 			return ba;
 		}
 
+		/**
+		 * 解析flv（未完成）
+		 * @param input
+		 * @return
+		 */
 		override public function decode(input:ByteArray):ICodec
 		{
 			if (!probe(input))
@@ -323,6 +380,12 @@ package cc.minos.codec.flv {
 			return this;
 		}
 
+		/**
+		 * 判断类型
+		 * flv的开头是固定的FLV3个字节
+		 * @param input
+		 * @return
+		 */
 		override public function probe(input:ByteArray):Boolean
 		{
 			if (input[0] == 0x46 && input[1] == 0x4C && input[2] == 0x56 && input[3] < 5)

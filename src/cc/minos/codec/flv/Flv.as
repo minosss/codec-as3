@@ -81,7 +81,5 @@ package cc.minos.codec.flv {
         public static const TAG_TYPE_VIDEO:uint = 0x09;
         public static const TAG_TYPE_META:uint = 0x12;
 
-        //
-
     }
 }

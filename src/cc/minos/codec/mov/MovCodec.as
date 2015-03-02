@@ -10,10 +10,19 @@ package cc.minos.codec.mov {
 
 	import flash.utils.ByteArray;
 
+	/**
+	 * mp4解析
+	 * moov記錄了整個視頻的數據
+	 * stbl記錄幀的數據（位移大小等，獲取的時候需要分析chunk(1個chunk可以有幾個sample))
+	 * stsd記錄編碼的數據，視頻或音頻的解析需要在這裏取數據
+	 */
 	public class MovCodec extends Codec {
 
+		//數據信息
 		protected var moovBox:MoovBox;
+		//視頻幀列表
 		protected var _videoSamples:Vector.<Sample>;
+		//音頻幀列表
 		protected var _audioSamples:Vector.<Sample>;
 
 		public function MovCodec()
@@ -23,6 +32,13 @@ package cc.minos.codec.mov {
 			_mimeType = "application/mp4,application/f4v";
 		}
 
+		/**
+		 * 排序
+		 * @param a
+		 * @param b
+		 * @param array
+		 * @return
+		 */
 		private function sortByTimestamp(a:Object, b:Object, array:Array = null):int
 		{
 			if (a.timestamp < b.timestamp)
@@ -44,6 +60,11 @@ package cc.minos.codec.mov {
 			return 0;
 		}
 
+		/**
+		 * 解析
+		 * @param input
+		 * @return
+		 */
 		override public function decode(input:ByteArray):ICodec
 		{
             if(!probe(input))
@@ -51,6 +72,7 @@ package cc.minos.codec.mov {
 
 			this._rawData = input;
 			//find moov box
+			//直接搜moov解析
 			var offset:uint;
 			var size:uint;
 			var type:uint;
@@ -74,7 +96,7 @@ package cc.minos.codec.mov {
 			}
 			//
 			_duration = moovBox.mvhdBox.duration;
-			//
+			//獲取解析的數據
 			for (var i:int = 0; i < moovBox.traks.length; i++)
 			{
 				var trak:TrakBox = moovBox.traks[i] as TrakBox;
@@ -100,6 +122,7 @@ package cc.minos.codec.mov {
 					_audioConfig = trak.stsdBox.configurationData;
 				}
 			}
+			//根據時間戳排列幀
 			_frames = new Vector.<IFrame>();
 			if (_videoSamples != null)
 			{
@@ -120,11 +143,21 @@ package cc.minos.codec.mov {
 			return this;
 		}
 
+		/**
+		 * 封裝（未完成）
+		 * @param input
+		 * @return
+		 */
 		override public function encode(input:ICodec):ByteArray
 		{
 			return null;
 		}
 
+		/**
+		 * 判斷
+		 * @param input
+		 * @return
+		 */
 		override public function probe(input:ByteArray):Boolean
 		{
 			if (input[4] == 0x66 && input[5] == 0x74 && input[6] == 0x79 && input[7] == 0x70)

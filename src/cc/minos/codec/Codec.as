@@ -13,35 +13,42 @@ package cc.minos.codec {
 
 	public class Codec extends Object implements ICodec {
 
+		//封装类型
 		protected var _name:String = ':)'
+		//拓展
 		protected var _extensions:String;
+		//格式
 		protected var _mimeType:String;
 
 		protected var _rawData:ByteArray = null;
-		;
 
-		//
+		//幀列表，包括視頻音頻
 		protected var _frames:Vector.<IFrame> = new Vector.<IFrame>();
+		//關鍵幀列表
 		protected var _keyframes:Vector.<uint> = null;
 
-		protected var _hasVideo:Boolean = false;
-		protected var _videoConfig:ByteArray = null; //sps & pps
-		protected var _videoCodec:uint;
-		protected var _videoWidth:Number = 0.0;
-		protected var _videoHeight:Number = 0.0;
-		protected var _videoRate:Number;
+		//視頻
+		protected var _hasVideo:Boolean = false; //是否有視頻數據
+		protected var _videoConfig:ByteArray = null; //sps & pps  解析數據
+		protected var _videoCodec:uint; //編碼類型
+		protected var _videoWidth:Number = 0.0;  //寬
+		protected var _videoHeight:Number = 0.0; //高
+		protected var _videoRate:Number; //比特率
 
-		protected var _frameRate:Number = 0.0; //fps
+		//幀頻fps
+		protected var _frameRate:Number = 0.0;
 
-		protected var _hasAudio:Boolean = false;
-		protected var _audioConfig:ByteArray = null; //audio specs
-		protected var _audioCodec:uint;
-		protected var _audioType:uint = 10;
-		protected var _audioRate:Number = 44100;
-		protected var _audioSize:Number = 16;
-		protected var _audioChannels:uint = 2;
-		protected var _audioProperties:uint = 0;
+		//音頻
+		protected var _hasAudio:Boolean = false; //是否有音頻
+		protected var _audioConfig:ByteArray = null; //音頻解析數據
+		protected var _audioCodec:uint; //編碼類型
+		protected var _audioType:uint = 10; //音頻類型
+		protected var _audioRate:Number = 44100; //赫茲
+		protected var _audioSize:Number = 16; //質量
+		protected var _audioChannels:uint = 2; //聲道
+		protected var _audioProperties:uint = 0; //標籤
 
+		//時間
 		protected var _duration:Number = 0.0;
 
 		public function Codec()
