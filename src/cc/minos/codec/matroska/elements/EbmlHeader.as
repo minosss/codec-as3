@@ -11,40 +11,35 @@ package cc.minos.codec.matroska.elements {
 
         public function EbmlHeader()
         {
-            super(cc.minos.codec.matroska.Matroska.EBML_ID);
+            super(Matroska.EBML_ID);
         }
 
         override protected function init():void
         {
-            trace( 'header ====== ', type.toString(16), size );
+            trace( 'ebml header', type.toString(16), size );
 
             //ebml version
-
             //ebml read version
-
             //ebml max id length
-
             //ebml max size length
-
             //doc type
-
+            trace('doc type: ' + getChildByType(Matroska.EBML_DOC_TYPE)[0].getString() );
             //doc version
-
             //doc read version
-            trace('childs: ' + childs.length);
+            trace('ebml header end. children: ' + children.length);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.EBML_VERSION:
-                case cc.minos.codec.matroska.Matroska.EBML_READ_VERSION:
-                case cc.minos.codec.matroska.Matroska.EBML_MAX_ID_LENGTH:
-                case cc.minos.codec.matroska.Matroska.EBML_MAX_SIZE_LENGTH:
-                case cc.minos.codec.matroska.Matroska.EBML_DOC_TYPE:
-                case cc.minos.codec.matroska.Matroska.EBML_DOC_TYPE_VERSION:
-                case cc.minos.codec.matroska.Matroska.EBML_DOC_TYPE_READ_VERSION:
+                case Matroska.EBML_VERSION:
+                case Matroska.EBML_READ_VERSION:
+                case Matroska.EBML_MAX_ID_LENGTH:
+                case Matroska.EBML_MAX_SIZE_LENGTH:
+                case Matroska.EBML_DOC_TYPE:
+                case Matroska.EBML_DOC_TYPE_VERSION:
+                case Matroska.EBML_DOC_TYPE_READ_VERSION:
                     return new VarElement(type);
                     break;
             }

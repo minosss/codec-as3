@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/8 16:41
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.Mp4;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.Mov;
 
     public class FtypBox extends Box {
 
@@ -14,7 +14,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function FtypBox()
         {
-            super(Mp4.BOX_TYPE_FTYP);
+            super(Mov.BOX_TYPE_FTYP);
         }
 
         override protected function init():void

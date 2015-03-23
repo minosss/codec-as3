@@ -17,8 +17,8 @@ Codec-AS3
 ```as3
 var mp4:Mp4Codec = new Mp4Codec();
 mp4.decode(mp4bytes);
-var flvbytes:ByteArray = new FlvCodec().encode(mp4);
-netstream.appendBytes(flvbytes);
+var bytes:ByteArray = new FlvCodec().encode(mp4);
+ns.appendBytes(bytes);
 ```
 
 ##Roadmap

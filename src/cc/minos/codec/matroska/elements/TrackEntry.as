@@ -8,42 +8,58 @@ package cc.minos.codec.matroska.elements {
 
     import com.hurlant.util.Hex;
 
+    import flash.utils.ByteArray;
+
     public class TrackEntry extends Element {
+
+        private var _trackType:uint;
+        private var _configurationData:ByteArray;
+
+        //video
+        private var _videoWidth:uint;
+        private var _videoHeight:uint;
+        private var _videoCodecId:uint;
+        //audio
+        private var _audioChannels:uint;
+        private var _audioSize:uint;
+        private var _audioRate:Number;
+        private var _audioCodecId:uint;
+
         public function TrackEntry()
         {
-            super(cc.minos.codec.matroska.Matroska.TRACK_ENTRY);
+            super(Matroska.TRACK_ENTRY);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.TRACK_NUMBER:
-                case cc.minos.codec.matroska.Matroska.TRACK_TYPE: //
-                case cc.minos.codec.matroska.Matroska.TRACK_UID:
-                case cc.minos.codec.matroska.Matroska.TRACK_FLAG_DEFAULT:
-                case cc.minos.codec.matroska.Matroska.TRACK_FLAG_FORCED:
-                case cc.minos.codec.matroska.Matroska.TRACK_FLAG_ENABLED:
-                case cc.minos.codec.matroska.Matroska.TRACK_FLAG_LACING:
-                case cc.minos.codec.matroska.Matroska.TRACK_MIN_CACHE:
-                case cc.minos.codec.matroska.Matroska.TRACK_MAX_CACHE:
-                case cc.minos.codec.matroska.Matroska.TRACK_DEFAULT_DURATION:
-                case cc.minos.codec.matroska.Matroska.TRACK_TIMECODE_SCALE:
-                case cc.minos.codec.matroska.Matroska.TRACK_NAME:
-                case cc.minos.codec.matroska.Matroska.TRACK_LANGUAGE:
-                case cc.minos.codec.matroska.Matroska.TRACK_CODEC_ID:
-                case cc.minos.codec.matroska.Matroska.TRACK_CODEC_PRIVATE:
-                case cc.minos.codec.matroska.Matroska.TRACK_CODEC_NAME:
-                case cc.minos.codec.matroska.Matroska.TRACK_ATTACHMENT_LINK:
+                case Matroska.TRACK_NUMBER:
+                case Matroska.TRACK_TYPE: //
+                case Matroska.TRACK_UID:
+                case Matroska.TRACK_FLAG_DEFAULT:
+                case Matroska.TRACK_FLAG_FORCED:
+                case Matroska.TRACK_FLAG_ENABLED:
+                case Matroska.TRACK_FLAG_LACING:
+                case Matroska.TRACK_MIN_CACHE:
+                case Matroska.TRACK_MAX_CACHE:
+                case Matroska.TRACK_DEFAULT_DURATION:
+                case Matroska.TRACK_TIMECODE_SCALE:
+                case Matroska.TRACK_NAME:
+                case Matroska.TRACK_LANGUAGE:
+                case Matroska.TRACK_CODEC_ID:
+                case Matroska.TRACK_CODEC_PRIVATE:
+                case Matroska.TRACK_CODEC_NAME:
+                case Matroska.TRACK_ATTACHMENT_LINK:
                     return new VarElement(type);
                 // video track
-                case cc.minos.codec.matroska.Matroska.TRACK_VIDEO:
+                case Matroska.TRACK_VIDEO:
                     return new VideoTrack();
                 // audio track
-                case cc.minos.codec.matroska.Matroska.TRACK_AUDIO:
+                case Matroska.TRACK_AUDIO:
                     return new AudioTrack();
                 // information
-                case cc.minos.codec.matroska.Matroska.CONTENT_ENCODINGS:
+                case Matroska.CONTENT_ENCODINGS:
                     return new ContentEncodings();
             }
             return super.getElement(type);
@@ -52,24 +68,84 @@ package cc.minos.codec.matroska.elements {
         override protected function init():void
         {
             //
-            for(var i:int = 0; i < childs.length; i++)
+            trace(' === track entry === ')
+            for(var i:int = 0; i < children.length; i++)
             {
-                var e:Element = childs[i];
-                if( e.type == cc.minos.codec.matroska.Matroska.TRACK_CODEC_ID )
+                var e:Element = children[i];
+                if( e.type == Matroska.TRACK_CODEC_ID )
                 {
                     trace('codec id: ' + e.getString()); //
                 }
-                else if( e.type == cc.minos.codec.matroska.Matroska.TRACK_TYPE )
+                else if( e.type == Matroska.TRACK_TYPE )
                 {
                     trace('type: ' + e.getInt().toString(16)); //
-                }else if( e.type == cc.minos.codec.matroska.Matroska.TRACK_DEFAULT_DURATION )
+                    _trackType = e.getInt();
+                }else if( e.type == Matroska.TRACK_DEFAULT_DURATION )
                 {
                     trace('timestamp: ' + e.getInt());
-                }else if( e.type == cc.minos.codec.matroska.Matroska.TRACK_CODEC_PRIVATE )
+                }else if( e.type == Matroska.TRACK_CODEC_PRIVATE )
                 {
                     trace('codec private: ' + e.data.length );
+                    e.data.position = 0;
+                    trace(e.data.readByte());
+                    trace(e.data.readByte());
+                    trace(e.data.readByte());
+                    _configurationData = new ByteArray();
+                    _configurationData.writeBytes( e.data, 3, e.data.bytesAvailable );
+                }
+                else if( e.type == Matroska.TRACK_CODEC_NAME )
+                {
+                    trace('codec name: ' + e.getString() );
+                }
+                else if( e.type == Matroska.TRACK_VIDEO )
+                {
+                    var v:VideoTrack = e as VideoTrack;
+                    _videoWidth = v.width;
+                    _videoHeight = v.height;
+                }
+                else if( e.type == Matroska.TRACK_AUDIO )
+                {
+                    var a:AudioTrack = e as AudioTrack;
+                    //
                 }
             }
+
+            trace('track end. children: ' + children.length );
+        }
+
+        public function get configurationData():ByteArray
+        {
+            return _configurationData;
+        }
+
+        public function get trackType():uint
+        {
+            return _trackType;
+        }
+
+        public function get videoWidth():uint
+        {
+            return _videoWidth;
+        }
+
+        public function get videoHeight():uint
+        {
+            return _videoHeight;
+        }
+
+        public function get audioChannels():uint
+        {
+            return _audioChannels;
+        }
+
+        public function get audioSize():uint
+        {
+            return _audioSize;
+        }
+
+        public function get audioRate():Number
+        {
+            return _audioRate;
         }
     }
 }

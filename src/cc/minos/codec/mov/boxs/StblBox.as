@@ -3,11 +3,11 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/9 11:20
  */
-package cc.minos.codec.mp4.boxs {
+package cc.minos.codec.mov.boxs {
 
     import cc.minos.codec.flv.Flv;
-    import cc.minos.codec.mp4.Mp4;
-    import cc.minos.codec.mp4.Sample;
+    import cc.minos.codec.mov.Mov;
+    import cc.minos.codec.mov.Sample;
 
     /**
      * sample table
@@ -24,19 +24,19 @@ package cc.minos.codec.mp4.boxs {
 
         public function StblBox()
         {
-            super(Mp4.BOX_TYPE_STBL);
+            super(Mov.BOX_TYPE_STBL);
         }
 
         override protected function init():void
         {
 
             //stts
-            _sttsBox = getBox(Mp4.BOX_TYPE_STTS).shift() as SttsBox;
+            _sttsBox = getBox(Mov.BOX_TYPE_STTS).shift() as SttsBox;
 
             //stsz
             var sizes:Vector.<uint>;
             try{
-                var stszBox:StszBox = getBox(Mp4.BOX_TYPE_STSZ).shift() as StszBox;
+                var stszBox:StszBox = getBox(Mov.BOX_TYPE_STSZ).shift() as StszBox;
                 sizes = stszBox.sizes;
             }catch(er:Error)
             {
@@ -46,14 +46,14 @@ package cc.minos.codec.mp4.boxs {
             }
             //stsc
             var entrys:Vector.<Object>;
-            var stscBox:StscBox = getBox(Mp4.BOX_TYPE_STSC).shift() as StscBox;
+            var stscBox:StscBox = getBox(Mov.BOX_TYPE_STSC).shift() as StscBox;
             entrys = stscBox.entrys;
 
             //stco
             var chunksOffset:Vector.<uint>;
             try
             {
-                var stcoBox:StcoBox = getBox(Mp4.BOX_TYPE_STCO).shift() as StcoBox;
+                var stcoBox:StcoBox = getBox(Mov.BOX_TYPE_STCO).shift() as StcoBox;
                 chunksOffset = stcoBox.chunksOffset;
             }catch(er:Error)
             {
@@ -65,7 +65,7 @@ package cc.minos.codec.mp4.boxs {
             var keyframes:Vector.<uint>;
             try
             {
-                _stssBox = getBox(Mp4.BOX_TYPE_STSS).shift() as StssBox;
+                _stssBox = getBox(Mov.BOX_TYPE_STSS).shift() as StssBox;
                 keyframes = _stssBox.keyframes;
                 hasKey = true;
             }catch(er:Error)
@@ -129,7 +129,7 @@ package cc.minos.codec.mp4.boxs {
                 trace(keyframes[j], samples[keyframes[j]].offset);
             }*/
 
-            _stsdBox = getBox(Mp4.BOX_TYPE_STSD).shift() as StsdBox;
+            _stsdBox = getBox(Mov.BOX_TYPE_STSD).shift() as StsdBox;
         }
 
         public function get samples():Vector.<Sample>

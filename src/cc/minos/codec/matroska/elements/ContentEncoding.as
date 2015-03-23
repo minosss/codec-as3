@@ -9,21 +9,27 @@ package cc.minos.codec.matroska.elements {
     public class ContentEncoding extends Element {
         public function ContentEncoding()
         {
-            super(cc.minos.codec.matroska.Matroska.CONTENT_ENCODING);
+            super(Matroska.CONTENT_ENCODING);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.CONTENT_ENCODING_ORDER:
-                case cc.minos.codec.matroska.Matroska.CONTENT_ENCODING_SCOPE:
-                case cc.minos.codec.matroska.Matroska.CONTENT_ENCODING_TYPE:
-                case cc.minos.codec.matroska.Matroska.CONTENT_COMPRESSION:
-                case cc.minos.codec.matroska.Matroska.CONTENT_ENCRYPTION:
+                case Matroska.CONTENT_ENCODING_ORDER:
+                case Matroska.CONTENT_ENCODING_SCOPE:
+                case Matroska.CONTENT_ENCODING_TYPE:
+                case Matroska.CONTENT_COMPRESSION:
+                case Matroska.CONTENT_ENCRYPTION:
                     return new VarElement(type);
             }
             return super.getElement(type);
+        }
+
+        override protected function init():void
+        {
+            trace('content encoding <');
+            trace('content encoding end. children: ' + children.length );
         }
     }
 }

@@ -9,14 +9,14 @@ package cc.minos.codec.matroska.elements {
     public class Cues extends Element {
         public function Cues()
         {
-            super(cc.minos.codec.matroska.Matroska.CUES);
+            super(Matroska.CUES);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.CUES_CUE_POINT:
+                case Matroska.CUES_CUE_POINT:
                     return new CuePoint();
             }
             return super.getElement(type);
@@ -25,6 +25,10 @@ package cc.minos.codec.matroska.elements {
         override protected function init():void
         {
             trace('cues: ' + toString() );
+            trace('children: ' + children.length );
+//            trace((children[0].children[0].getInt()));
+//            trace(toHex(children[0].children[1].children[0].data)); //track number
+//            trace((children[0].children[1].children[1].getInt()));
         }
     }
 }

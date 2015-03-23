@@ -3,9 +3,9 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/8 16:36
  */
-package cc.minos.codec.mp4.boxs {
+package cc.minos.codec.mov.boxs {
 
-    import cc.minos.codec.mp4.Mp4;
+    import cc.minos.codec.mov.Mov;
     import cc.minos.codec.utils.ByteArrayUtil;
     import flash.utils.ByteArray;
 
@@ -18,7 +18,7 @@ package cc.minos.codec.mp4.boxs {
         private var _size:uint = 0;
         private var _position:uint = 0;
         private var _data:ByteArray;
-        private var _childs:Vector.<Box>;
+        private var _children:Vector.<Box>;
 
         public function Box( type:uint )
         {
@@ -28,7 +28,7 @@ package cc.minos.codec.mp4.boxs {
         public function parse( byte:ByteArray ):void
         {
             this.data = byte;
-            this._childs = new Vector.<Box>();
+            this._children = new Vector.<Box>();
 
             var size:uint;
             var type:uint;
@@ -48,7 +48,7 @@ package cc.minos.codec.mp4.boxs {
                     continue;
                 }
                 end = offset + size;
-                box = Mp4.getBox(type);
+                box = Mov.getBox(type);
                 if( box )
                 {
                     box.size = size;
@@ -56,7 +56,7 @@ package cc.minos.codec.mp4.boxs {
                     var d:ByteArray = new ByteArray();
                     d.writeBytes(data, offset, size);
                     box.parse(d);
-                    _childs.push(box);
+                    _children.push(box);
                 }
                 else
                 {
@@ -85,13 +85,13 @@ package cc.minos.codec.mp4.boxs {
         public function getBox(type:uint):Vector.<Box>
         {
             var boxs:Vector.<Box> = new Vector.<Box>();
-            if(_childs.length > 0)
+            if(_children.length > 0)
             {
-                for each(var b:Box in _childs)
+                for each(var b:Box in _children)
                 {
                     if( b.type === type )
                         boxs.push(b);
-                    else if( boxs.length == 0 && b.childs.length > 0 )
+                    else if( boxs.length == 0 && b.children.length > 0 )
                     {
                         boxs = b.getBox(type);
                         if( boxs.length > 0 ){
@@ -138,9 +138,9 @@ package cc.minos.codec.mp4.boxs {
             return _type;
         }
 
-        public function get childs():Vector.<Box>
+        public function get children():Vector.<Box>
         {
-            return _childs;
+            return _children;
         }
 
         public function toString():String

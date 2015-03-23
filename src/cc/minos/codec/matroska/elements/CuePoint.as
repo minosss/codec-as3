@@ -7,20 +7,23 @@ package cc.minos.codec.matroska.elements {
     import cc.minos.codec.matroska.Matroska;
 
     public class CuePoint extends Element {
+
         public function CuePoint()
         {
-            super(cc.minos.codec.matroska.Matroska.CUES_CUE_POINT);
+            super(Matroska.CUES_CUE_POINT);
         }
 
         override protected function getElement(type:uint):Element
         {
             switch (type)
             {
-                case cc.minos.codec.matroska.Matroska.POINT_CUE_TIME:
-                case cc.minos.codec.matroska.Matroska.POINT_CUE_TRACK_POSITIONS:
+                case Matroska.POINT_CUE_TIME:
                     return new VarElement(type);
+                case Matroska.POINT_CUE_TRACK_POSITIONS:
+                    return new CuePosition();
             }
             return super.getElement(type);
         }
+
     }
 }

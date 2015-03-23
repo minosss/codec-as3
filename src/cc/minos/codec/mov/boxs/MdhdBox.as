@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/18 14:22
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.Mp4;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.Mov;
 
     public class MdhdBox extends Box {
 
@@ -14,7 +14,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function MdhdBox()
         {
-            super(Mp4.BOX_TYPE_MDHD);
+            super(Mov.BOX_TYPE_MDHD);
         }
 
         override protected function init():void

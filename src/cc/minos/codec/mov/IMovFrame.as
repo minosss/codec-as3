@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/25 09:39
  */
-package cc.minos.codec.mp4 {
-    public interface IMp4Frame {
+package cc.minos.codec.mov {
+    public interface IMovFrame {
 
         function get sampleIndex():uint;
         function set sampleIndex(value:uint):void;

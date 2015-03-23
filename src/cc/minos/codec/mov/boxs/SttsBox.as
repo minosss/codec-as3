@@ -3,8 +3,8 @@
  * Author: SiuzukZan <minoscc@gmail.com>
  * Date: 14/12/18 14:17
  */
-package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.Mp4;
+package cc.minos.codec.mov.boxs {
+    import cc.minos.codec.mov.Mov;
 
     public class SttsBox extends Box {
 
@@ -13,7 +13,7 @@ package cc.minos.codec.mp4.boxs {
 
         public function SttsBox()
         {
-            super(Mp4.BOX_TYPE_STTS);
+            super(Mov.BOX_TYPE_STTS);
         }
 
         override protected function init():void
