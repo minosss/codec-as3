@@ -5,13 +5,10 @@
  */
 package cc.minos.codec {
 
-	import cc.minos.codec.flv.FlvCodec;
-	import cc.minos.codec.matroska.MatroskaCodec;
-	import cc.minos.codec.mov.MovCodec;
-
+	import cc.minos.codec.flv.Frame;
 	import flash.utils.ByteArray;
 
-	public class Codec extends Object implements ICodec {
+	public class Codec extends Object {
 
 		//封装类型
 		protected var _name:String = ':)'
@@ -19,13 +16,13 @@ package cc.minos.codec {
 		protected var _extensions:String;
 		//格式
 		protected var _mimeType:String;
-
+		//源數據
 		protected var _rawData:ByteArray = null;
 
 		//幀列表，包括視頻音頻
-		protected var _frames:Vector.<IFrame> = new Vector.<IFrame>();
+		protected var _frames:Vector.<Frame> = new Vector.<Frame>();
 		//關鍵幀列表
-		protected var _keyframes:Vector.<uint> = null;
+		protected var _keyframes:Array;
 
 		//視頻
 		protected var _hasVideo:Boolean = false; //是否有視頻數據
@@ -116,22 +113,17 @@ package cc.minos.codec {
 
 		/* byte handlers end */
 
-		public function decode(input:ByteArray):ICodec
-		{
-			return this;
-		}
-
-		public function encode(input:ICodec):ByteArray
+		public function decode(input:ByteArray):Codec
 		{
 			return null;
 		}
 
-		public function probe(input:ByteArray):Boolean
+		public function encode(input:Codec):ByteArray
 		{
-			return false;
+			return null;
 		}
 
-		public function getDataByFrame(frame:IFrame):ByteArray
+		public function getDataByFrame(frame:Frame):ByteArray
 		{
 			var b:ByteArray = new ByteArray();
 			b.writeBytes(_rawData, frame.offset, frame.size);
@@ -158,12 +150,12 @@ package cc.minos.codec {
 			return _name;
 		}
 
-		public function get frames():Vector.<IFrame>
+		public function get frames():Vector.<Frame>
 		{
 			return _frames;
 		}
 
-		public function get keyframes():Vector.<uint>
+		public function get keyframes():Array
 		{
 			return _keyframes;
 		}
@@ -241,23 +233,6 @@ package cc.minos.codec {
 		public function get audioChannels():uint
 		{
 			return _audioChannels;
-		}
-
-		/**
-		 *
-		 * @param input
-		 * @return
-		 */
-		public static function decode( input:ByteArray ):ICodec
-		{
-			var c:ICodec;
-			if (input[4] == 0x66 && input[5] == 0x74 && input[6] == 0x79 && input[7] == 0x70) //FTYP
-				c = new MovCodec();
-			else if (input[0] == 0x1A && input[1] == 0x45 && input[2] == 0xDF && input[3] == 0xA3) //EBML
-				c = new MatroskaCodec();
-			else
-				throw new Error('Not Supported!!!');
-			return c.decode(input);
 		}
 
 	}

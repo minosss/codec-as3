@@ -5,6 +5,7 @@ bin-release/
 
 # Other files and folders
 .settings/
+.idea/
 codec-as3.iml
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
