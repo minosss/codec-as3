@@ -20,6 +20,7 @@ package cc.minos.codec.mp4.boxs {
 
 		private var _stsdBox:StsdBox;
 		private var _sttsBox:SttsBox;
+		private var _cttsBox:CttsBox;
 		private var _stssBox:StssBox;
 
 		public function StblBox()
@@ -32,6 +33,17 @@ package cc.minos.codec.mp4.boxs {
 
 			//stts
 			_sttsBox = getBox(Mp4.BOX_TYPE_STTS).shift() as SttsBox;
+			var st:Array = _sttsBox.entries;
+
+			//ctts
+			var ct:Array;
+			try
+			{
+				_cttsBox = getBox(Mp4.BOX_TYPE_CTTS).shift() as CttsBox;
+				ct = _cttsBox.entries;
+			} catch (er:Error)
+			{
+			}
 
 			//stsz
 			var sizes:Vector.<uint>;
@@ -108,6 +120,11 @@ package cc.minos.codec.mp4.boxs {
 					s.offset = offset;
 					s.index = samIndex;
 					s.size = sizes[samIndex];
+					s.timestamp = st[samIndex]
+					if (ct)
+					{
+						s.timestamp += ct[samIndex];
+					}
 					if (hasKey)
 					{
 						s.dataType = Flv.TAG_TYPE_VIDEO;

@@ -36,9 +36,8 @@ package cc.minos.codec.mp4.boxs {
 
 			for each(var sample:Sample in _stblBox.samples)
 			{
-				sample.timestamp = sample.index * sampleDelta;
+				sample.timestamp = toMillisecond(sample.timestamp);
 			}
-
 		}
 
 		public function get trakType():uint
@@ -76,14 +75,14 @@ package cc.minos.codec.mp4.boxs {
 			return _stblBox.samples;
 		}
 
-		public function get sampleDelta():Number
+		private function toMillisecond(ts:Number):Number
 		{
-			return ( _stblBox.sttsBox.delta / _mdhdBox.timeScale ) * 1000;
+			return ( ts / _mdhdBox.timeScale ) * 1000;
 		}
 
 		public function get framerate():Number
 		{
-			return ( _stblBox.sttsBox.count / ( _mdhdBox.duration / _mdhdBox.timeScale ) );
+			return ( _stblBox.samples.length / ( _mdhdBox.duration / _mdhdBox.timeScale ) );
 		}
 
 		public function get stsdBox():StsdBox
