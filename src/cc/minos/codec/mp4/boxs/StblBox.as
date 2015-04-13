@@ -6,7 +6,7 @@
 package cc.minos.codec.mp4.boxs {
 
 	import cc.minos.codec.mp4.Sample;
-	import cc.minos.codec.flv.Flv;
+	import cc.minos.codec.flv.FlvCodec;
 	import cc.minos.codec.mp4.Mp4;
 
 	/**
@@ -127,12 +127,12 @@ package cc.minos.codec.mp4.boxs {
 					}
 					if (hasKey)
 					{
-						s.dataType = Flv.TAG_TYPE_VIDEO;
-						s.frameType = (keyframes.indexOf(samIndex) != -1) ? Flv.VIDEO_FRAME_KEY : Flv.VIDEO_FRAME_INTER;
+						s.dataType = FlvCodec.TAG_TYPE_VIDEO;
+						s.frameType = (keyframes.indexOf(samIndex) != -1) ? FlvCodec.VIDEO_FRAME_KEY : FlvCodec.VIDEO_FRAME_INTER;
 					}
 					else
 					{
-						s.dataType = Flv.TAG_TYPE_AUDIO;
+						s.dataType = FlvCodec.TAG_TYPE_AUDIO;
 					}
 					_samples.push(s);
 					offset += sizes[samIndex];

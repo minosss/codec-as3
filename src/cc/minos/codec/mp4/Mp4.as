@@ -89,6 +89,8 @@ package cc.minos.codec.mp4 {
         public static const BOX_TYPE_AVCC:uint = 0x61766343;
         public static const BOX_TYPE_BTRT:uint = 0x62747274;
 
+        public static const BOX_TYPE_META:uint = 0x6D657461;
+
         public static const BOX_TYPE_FREE:uint = 0x66726565;
 
 
@@ -159,6 +161,7 @@ package cc.minos.codec.mp4 {
                     box = new MdhdBox();
                     break;
                 //others
+                case BOX_TYPE_META:
                 case BOX_TYPE_MDIA:
                 case BOX_TYPE_ELST:
                 case BOX_TYPE_MINF:
