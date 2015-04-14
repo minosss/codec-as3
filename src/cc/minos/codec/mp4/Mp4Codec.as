@@ -27,9 +27,9 @@ package cc.minos.codec.mp4 {
 
 		public function Mp4Codec()
 		{
-			_name = "mp4,f4v,mov";
-			_extensions = "mp4,f4v,mov";
-			_mimeType = "application/mp4,application/f4v";
+			_name = "mp4,f4v";
+			_extensions = "mp4,f4v";
+			_mimeType = "video/mp4";
 		}
 
 		/**
@@ -138,7 +138,7 @@ package cc.minos.codec.mp4 {
 					_frames.push(a);
 				}
 			}
-			_frames.sort(sortByTimestamp);
+//			_frames.sort(sortByTimestamp);
 
 			return this;
 		}
