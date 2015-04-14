@@ -48,6 +48,7 @@ package cc.minos.codec.mp4 {
         //track header
         public static const BOX_TYPE_TKHD:uint = 0x746B6864;
         public static const BOX_TYPE_EDTS:uint = 0x65647473;
+        public static const BOX_TYPE_ELST:uint = 0x656C7374;
         //track media information container
         public static const BOX_TYPE_MDIA:uint = 0x6D646961;
         //media header
@@ -71,6 +72,8 @@ package cc.minos.codec.mp4 {
         public static const BOX_TYPE_STSC:uint = 0x73747363;
         //sample size
         public static const BOX_TYPE_STSZ:uint = 0x7374737A;
+        //
+        public static const BOX_TYPE_CTTS:uint = 0x63747473;
         //sync sample table
         public static const BOX_TYPE_STSS:uint = 0x73747373;
         //chunk offset
@@ -85,6 +88,8 @@ package cc.minos.codec.mp4 {
         public static const BOX_TYPE_AVC1:uint = 0x61766331;
         public static const BOX_TYPE_AVCC:uint = 0x61766343;
         public static const BOX_TYPE_BTRT:uint = 0x62747274;
+
+        public static const BOX_TYPE_META:uint = 0x6D657461;
 
         public static const BOX_TYPE_FREE:uint = 0x66726565;
 
@@ -125,6 +130,9 @@ package cc.minos.codec.mp4 {
                 case BOX_TYPE_STSS:
                     box = new StssBox();
                     break;
+                case BOX_TYPE_CTTS:
+                    box = new CttsBox();
+                    break;
                 case BOX_TYPE_STSC:
                     box = new StscBox();
                     break;
@@ -153,7 +161,9 @@ package cc.minos.codec.mp4 {
                     box = new MdhdBox();
                     break;
                 //others
+                case BOX_TYPE_META:
                 case BOX_TYPE_MDIA:
+                case BOX_TYPE_ELST:
                 case BOX_TYPE_MINF:
                 case BOX_TYPE_UDTA:
                 case BOX_TYPE_IODS:

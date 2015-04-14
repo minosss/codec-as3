@@ -11,7 +11,7 @@ package cc.minos.codec.flv {
 	 * ...
 	 * @link http://www.adobe.com/content/dam/Adobe/en/devnet/flv/pdfs/video_file_format_spec_v10.pdf
 	 */
-	public class Flv extends Codec {
+	public class FlvCodec extends Codec {
 
 		/* video */
 
@@ -90,7 +90,7 @@ package cc.minos.codec.flv {
 		//关键帧列表（时间，位移）
 //		private var keyframesList:Array;
 
-		public function Flv()
+		public function FlvCodec()
 		{
 			_name = "flv";
 			_extensions = "flv";
@@ -247,7 +247,7 @@ package cc.minos.codec.flv {
 		private function byte_video(s:*, data:ByteArray, timestamp:Number, frameType:uint, codecId:uint, naluType:uint = 1, flagsSize:uint = 5):void
 		{
 			var tag:ByteArray = new ByteArray();
-			byte_w8(tag, Flv.TAG_TYPE_VIDEO); //tag type
+			byte_w8(tag, FlvCodec.TAG_TYPE_VIDEO); //tag type
 			byte_wb24(tag, data.length + flagsSize ); //data size
 			byte_wb24(tag, timestamp); //ts
 			byte_w8(tag, 0); //ts ext
@@ -280,7 +280,7 @@ package cc.minos.codec.flv {
 		private function byte_audio(s:*, data:ByteArray, timestamp:Number, prop:uint, packetType:uint = 1, flagsSize:uint = 2):void
 		{
 			var tag:ByteArray = new ByteArray();
-			byte_w8(tag, Flv.TAG_TYPE_AUDIO);
+			byte_w8(tag, FlvCodec.TAG_TYPE_AUDIO);
 			byte_wb24(tag, data.length + flagsSize );
 			byte_wb24(tag, timestamp); //ts
 			byte_w8(tag, 0); //ts ext
@@ -310,7 +310,7 @@ package cc.minos.codec.flv {
 			//这里是pps和sps，avc重要的组成部分，在文件的开头meta的后面，一定是关键帧
 			if (input.videoConfig)
 			{
-				byte_video(flv, input.videoConfig, 0, Flv.VIDEO_FRAME_KEY, Flv.VIDEO_CODECID_H264, 0);
+				byte_video(flv, input.videoConfig, 0, FlvCodec.VIDEO_FRAME_KEY, FlvCodec.VIDEO_CODECID_H264, 0);
 			}
 			//音频解析的部分，接着视频的解析数据
 			var flags:uint = 0;
@@ -326,9 +326,9 @@ package cc.minos.codec.flv {
 			for (var i:int = 0; i < input.frames.length; i++)
 			{
 				var f:Frame = input.frames[i];
-				if ( input.hasVideo && f.dataType == Flv.TAG_TYPE_VIDEO )
-					byte_video(flv, input.getDataByFrame(f), f.timestamp, f.frameType, Flv.VIDEO_CODECID_H264);
-				else if( input.hasAudio && f.dataType == Flv.TAG_TYPE_AUDIO )
+				if ( input.hasVideo && f.dataType == FlvCodec.TAG_TYPE_VIDEO )
+					byte_video(flv, input.getDataByFrame(f), f.timestamp, f.frameType, FlvCodec.VIDEO_CODECID_H264);
+				else if( input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO )
 					byte_audio(flv, input.getDataByFrame(f), f.timestamp, flags);
 			}
 
