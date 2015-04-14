@@ -94,7 +94,7 @@ package cc.minos.codec.flv {
 		{
 			_name = "flv";
 			_extensions = "flv";
-			_mimeType = "video/x-flv";
+			_mimeType = "video/flv";
 		}
 
 		private function byte_string(s:*, str:String):void
