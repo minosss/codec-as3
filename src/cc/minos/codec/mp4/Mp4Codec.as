@@ -39,16 +39,24 @@ package cc.minos.codec.mp4 {
 		 * @param array
 		 * @return
 		 */
-		private function sortByTimestamp(a:Object, b:Object, array:Array = null):int
+		private function sortByIndex(a:Object, b:Object, array:Array = null):int
 		{
-			if (a.timestamp < b.timestamp)
+			//改用渲染順序來排序
+			if (a.index < b.index )
+			{
+				return -1;
+			}
+			else if(a.index > b.index){
+				return 1;
+			}
+			/*if (a.timestamp < b.timestamp)
 			{
 				return -1;
 			}
 			else if (a.timestamp > b.timestamp)
 			{
 				return 1;
-			}
+			}*/
 			if (a.dataType == 0x09)
 			{
 				return -1;
@@ -138,7 +146,7 @@ package cc.minos.codec.mp4 {
 					_frames.push(a);
 				}
 			}
-//			_frames.sort(sortByTimestamp);
+			_frames.sort(sortByIndex);
 
 			return this;
 		}
