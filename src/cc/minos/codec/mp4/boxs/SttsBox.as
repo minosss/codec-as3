@@ -32,8 +32,8 @@ package cc.minos.codec.mp4.boxs {
 				sampleOffset = data.readUnsignedInt();
 				for (var j:uint = 0; j < sampleCount; j++)
 				{
-					sampleStart += sampleOffset;
 					_entries.push(sampleStart);
+					sampleStart += sampleOffset;
 				}
 			}
 		}

@@ -43,6 +43,7 @@ package cc.minos.codec.mp4.boxs {
 				ct = _cttsBox.entries;
 			} catch (er:Error)
 			{
+				trace("[STBL-BOX] ctts box not found!")
 			}
 
 			//stsz
@@ -53,7 +54,7 @@ package cc.minos.codec.mp4.boxs {
 				sizes = stszBox.sizes;
 			} catch (er:Error)
 			{
-				trace(er.message);
+				trace("[STBL-BOX] sample size list not found!");
 				sizes = new Vector.<uint>();
 				//stz2 ?
 			}
@@ -70,7 +71,7 @@ package cc.minos.codec.mp4.boxs {
 				chunksOffset = stcoBox.chunksOffset;
 			} catch (er:Error)
 			{
-				trace(er.message);
+				trace("[STBL-BOX] chunk offset list not found!");
 				chunksOffset = new Vector.<uint>();
 				//co64 ?
 			}
@@ -84,7 +85,6 @@ package cc.minos.codec.mp4.boxs {
 			} catch (er:Error)
 			{
 				trace('[STBL-BOX] Not found key frames!');
-				trace(er.message);
 				hasKey = false;
 			}
 
@@ -120,11 +120,12 @@ package cc.minos.codec.mp4.boxs {
 					s.offset = offset;
 					s.index = samIndex;
 					s.size = sizes[samIndex];
-					s.timestamp = st[samIndex]
+					s.timestamp = st[samIndex];
 					if (ct)
 					{
 						s.timestamp += ct[samIndex];
 					}
+					trace(samIndex, s.timestamp);
 					if (hasKey)
 					{
 						s.dataType = FlvCodec.TAG_TYPE_VIDEO;
