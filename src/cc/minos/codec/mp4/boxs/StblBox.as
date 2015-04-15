@@ -30,6 +30,7 @@ package cc.minos.codec.mp4.boxs {
 
 		override protected function init():void
 		{
+			_stsdBox = getBox(Mp4.BOX_TYPE_STSD).shift() as StsdBox;
 
 			//stts
 			_sttsBox = getBox(Mp4.BOX_TYPE_STTS).shift() as SttsBox;
@@ -55,7 +56,7 @@ package cc.minos.codec.mp4.boxs {
 			} catch (er:Error)
 			{
 				trace("[STBL-BOX] sample size list not found!");
-				sizes = new Vector.<uint>();
+				throw new Error("stz2 not parse");
 				//stz2 ?
 			}
 			//stsc
@@ -72,7 +73,7 @@ package cc.minos.codec.mp4.boxs {
 			} catch (er:Error)
 			{
 				trace("[STBL-BOX] chunk offset list not found!");
-				chunksOffset = new Vector.<uint>();
+				throw new Error("co64 not parse");
 				//co64 ?
 			}
 			//stss
@@ -125,11 +126,10 @@ package cc.minos.codec.mp4.boxs {
 					{
 						s.timestamp += ct[samIndex];
 					}
-					trace(samIndex, s.timestamp);
-					if (hasKey)
+					if (_stsdBox.videoWidth > 0)
 					{
 						s.dataType = FlvCodec.TAG_TYPE_VIDEO;
-						s.frameType = (keyframes.indexOf(samIndex) != -1) ? FlvCodec.VIDEO_FRAME_KEY : FlvCodec.VIDEO_FRAME_INTER;
+						s.frameType = (keyframes.indexOf(samIndex+1) != -1) ? FlvCodec.VIDEO_FRAME_KEY : FlvCodec.VIDEO_FRAME_INTER;
 					}
 					else
 					{
@@ -145,12 +145,6 @@ package cc.minos.codec.mp4.boxs {
 			trace('[STBL-BOX] chunk: ' + chunk.length);
 			trace('[STBL-BOX] samples: ' + samples.length);
 
-			/*for (var j:uint in keyframes)
-			 {
-			 trace(keyframes[j], samples[keyframes[j]].offset);
-			 }*/
-
-			_stsdBox = getBox(Mp4.BOX_TYPE_STSD).shift() as StsdBox;
 		}
 
 		public function get samples():Vector.<Sample>
