@@ -20,6 +20,7 @@ package cc.minos.codec.mp4.boxs {
 		private var _stblBox:StblBox;
 		//tkhd box
 		private var _tkhdBox:TkhdBox;
+		private var _framerate:Number;
 
 		public function TrakBox()
 		{
@@ -33,6 +34,8 @@ package cc.minos.codec.mp4.boxs {
 			_mdhdBox = getBox(Mp4.BOX_TYPE_MDHD).shift() as MdhdBox;
 			_tkhdBox = getBox(Mp4.BOX_TYPE_TKHD).shift() as TkhdBox;
 			_stblBox = getBox(Mp4.BOX_TYPE_STBL).shift() as StblBox;
+
+			_framerate = parseFloat(( _stblBox.samples.length / ( _mdhdBox.duration / _mdhdBox.timeScale )).toFixed(2));
 
 			for each(var sample:Sample in _stblBox.samples)
 			{
@@ -82,7 +85,7 @@ package cc.minos.codec.mp4.boxs {
 
 		public function get framerate():Number
 		{
-			return ( _stblBox.samples.length / ( _mdhdBox.duration / _mdhdBox.timeScale ) );
+			return _framerate;
 		}
 
 		public function get stsdBox():StsdBox
