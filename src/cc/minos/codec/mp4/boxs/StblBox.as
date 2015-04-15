@@ -9,6 +9,9 @@ package cc.minos.codec.mp4.boxs {
 	import cc.minos.codec.flv.FlvCodec;
 	import cc.minos.codec.mp4.Mp4;
 
+	CONFIG::LOGGING{
+		import cc.minos.codec.utils.Log;
+	}
 	/**
 	 * sample table
 	 */
@@ -44,7 +47,9 @@ package cc.minos.codec.mp4.boxs {
 				ct = _cttsBox.entries;
 			} catch (er:Error)
 			{
-				trace("[STBL-BOX] ctts box not found!")
+				CONFIG::LOGGING{
+					Log.info("ctts box not found!")
+				}
 			}
 
 			//stsz
@@ -55,7 +60,9 @@ package cc.minos.codec.mp4.boxs {
 				sizes = stszBox.sizes;
 			} catch (er:Error)
 			{
-				trace("[STBL-BOX] sample size list not found!");
+				CONFIG::LOGGING{
+					Log.info("sample size list not found!");
+				}
 				throw new Error("stz2 not parse");
 				//stz2 ?
 			}
@@ -72,7 +79,9 @@ package cc.minos.codec.mp4.boxs {
 				chunksOffset = stcoBox.chunksOffset;
 			} catch (er:Error)
 			{
-				trace("[STBL-BOX] chunk offset list not found!");
+				CONFIG::LOGGING{
+					Log.info("chunk offset list not found!");
+				}
 				throw new Error("co64 not parse");
 				//co64 ?
 			}
@@ -85,7 +94,9 @@ package cc.minos.codec.mp4.boxs {
 				hasKey = true;
 			} catch (er:Error)
 			{
-				trace('[STBL-BOX] Not found key frames!');
+				CONFIG::LOGGING{
+					Log.info('Not found key frames!');
+				}
 				hasKey = false;
 			}
 
@@ -142,9 +153,10 @@ package cc.minos.codec.mp4.boxs {
 				}
 			}
 
-			trace('[STBL-BOX] chunk: ' + chunk.length);
-			trace('[STBL-BOX] samples: ' + samples.length);
-
+			CONFIG::LOGGING{
+				Log.info('chunk: ' + chunk.length);
+				Log.info('samples: ' + samples.length);
+			}
 		}
 
 		public function get samples():Vector.<Sample>

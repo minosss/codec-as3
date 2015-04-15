@@ -10,6 +10,10 @@ package cc.minos.codec.mp4.boxs {
 
     import flash.utils.ByteArray;
 
+    CONFIG::LOGGING{
+        import cc.minos.codec.utils.Log;
+    }
+
     public class StsdBox extends Box {
 
         //video
@@ -31,16 +35,14 @@ package cc.minos.codec.mp4.boxs {
 
         override protected function decode():void
         {
-            trace('============= stsd box =================');
-
+            CONFIG::LOGGING{
+                Log.info('[stsd]');
+            }
             data.position += 4;     //version flags
             data.readUnsignedInt(); //count 1
-            //size
-            trace('size: ' + data.readUnsignedInt());
-            //type
-            var codecType:uint = data.readUnsignedInt();
-            trace('type: ' + ByteArrayUtil.toString(codecType.toString(16)));
 
+            var codecSize:uint = data.readUnsignedInt();
+            var codecType:uint = data.readUnsignedInt();
             _configurationData = new ByteArray();
             var offset:uint;
             var len:uint;
@@ -63,8 +65,6 @@ package cc.minos.codec.mp4.boxs {
                 //4 video frame pixel size (width + height)
                 _videoWidth = data.readUnsignedShort();
                 _videoHeight = data.readUnsignedShort();
-                trace('width: ' + _videoWidth );
-                trace('height: ' + _videoHeight );
                 //8 video resolution (horizontal + vertical)
                 trace('resolution horizontal: ' + data.readUnsignedInt());
                 trace('resolution vertical: ' + data.readUnsignedInt());
@@ -104,6 +104,10 @@ package cc.minos.codec.mp4.boxs {
                 data.position = offset;
                 _configurationData.writeBytes( data, offset, data.bytesAvailable );
 
+                CONFIG::LOGGING{
+                    Log.info('width', _videoWidth);
+                    Log.info('height', _videoHeight);
+                }
             }
             else if(codecType == Mp4.BOX_TYPE_MP4A )
             {
@@ -112,30 +116,34 @@ package cc.minos.codec.mp4.boxs {
                 //2 data reference index
                 data.position += 2;
                 //2 audio encoding version 0
-                trace('encoding version: ' + data.readUnsignedShort());
+                data.readUnsignedShort();
                 //2 audio encoding revision level 0
-                trace('encoding revision level: ' + data.readUnsignedShort());
+                data.readUnsignedShort();
                 //4 audio encoding vendor 0
-                trace('encoding vendor: ' + data.readUnsignedInt());
+                data.readUnsignedInt();
                 //2 audio channels  (mono = 1 ; stereo = 2)
                 _audioChannels = data.readUnsignedShort();
-                trace('channels: ' + _audioChannels );
+//                trace('channels: ' + _audioChannels );
                 //2 audio sample size (8 or 16)
                 _audioSize = data.readUnsignedShort();
-                trace('sample size: ' + _audioSize );
+//                trace('sample size: ' + _audioSize );
                 //2 audio compression id 0
                 data.readShort();
                 //2 audio packet size 0
                 data.readShort();
                 //4 audio sample rate
                 _audioRate = data.readUnsignedInt() / Mp4.FIXED_POINT_16_16
-                trace('rate: ' + _audioRate );
+//                trace('rate: ' + _audioRate );
+
+                CONFIG::LOGGING{
+                    Log.info('channels: ', _audioChannels);
+                    Log.info('size: ', _audioSize);
+                    Log.info('rate: ', _audioRate);
+                }
 
                 //========= ESDS | M4DS ==========
-                //size
-                data.readUnsignedInt();
-                //type
-                trace( 'type: ' + ByteArrayUtil.toString(data.readUnsignedInt().toString(16)) );
+                var dsSize:uint = data.readUnsignedInt();
+                var dsType:uint = data.readUnsignedInt();
 
                 //0x03 0x04 0x05
                 while( data.bytesAvailable > 0 )
@@ -151,8 +159,6 @@ package cc.minos.codec.mp4.boxs {
                         break;
                     }
                 }
-                trace('configuration: ' + _configurationData.length );
-
             }
             //
             data.position = data.length;

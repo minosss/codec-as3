@@ -77,7 +77,7 @@ package cc.minos.codec.mp4.boxs {
 
 		private function toMillisecond(ts:Number):Number
 		{
-			return ( ts / _mdhdBox.timeScale ) * 1000;
+			return parseFloat(((ts / _mdhdBox.timeScale) * 1000).toFixed(2));
 		}
 
 		public function get framerate():Number

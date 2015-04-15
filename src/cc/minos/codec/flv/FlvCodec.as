@@ -345,9 +345,8 @@ package cc.minos.codec.flv {
 				{
 					byte_number(flv, _keyframes[k].position);
 				}
-//				_keyframes.length = 0;
-				flv.position = 0;
 			}
+			flv.position = 0;
 			return flv;
 		}
 
@@ -427,7 +426,6 @@ package cc.minos.codec.flv {
 				_rawData.position = end;
 			}
 
-			trace('all frames: ' + _frames.length);
 			return this;
 		}
 
