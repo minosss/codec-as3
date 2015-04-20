@@ -5,7 +5,6 @@
  */
 package cc.minos.codec.mkv.elements {
 
-    import cc.minos.codec.IFrame;
     import cc.minos.codec.mkv.Mkv;
     import cc.minos.codec.mkv.MkvFrame;
 
@@ -14,7 +13,7 @@ package cc.minos.codec.mkv.elements {
     public class Cluster extends Element {
 
         private var _timeCode:uint;
-        private var _frames:Vector.<IFrame>;
+        private var _frames:Vector.<MkvFrame>;
 
         public function Cluster()
         {
@@ -38,7 +37,7 @@ package cc.minos.codec.mkv.elements {
         override protected function init():void
         {
 //            trace('cluster: ' + toString() );
-            _frames = new Vector.<IFrame>();
+            _frames = new Vector.<MkvFrame>();
             for(var i:int =0;i<children.length;i++)
             {
                 if( children[i].type == Mkv.CLUSTER_TIMECODE )
@@ -52,7 +51,7 @@ package cc.minos.codec.mkv.elements {
             }
         }
 
-        private function parseSimpleBlock(element:Element, index:uint):IFrame
+        private function parseSimpleBlock(element:Element, index:uint):MkvFrame
         {
             var f:MkvFrame = new MkvFrame();
             var d:ByteArray = element.data;
@@ -104,7 +103,7 @@ package cc.minos.codec.mkv.elements {
             return tmp;
         }
 
-        public function get frames():Vector.<IFrame>
+        public function get frames():Vector.<MkvFrame>
         {
             return _frames;
         }
