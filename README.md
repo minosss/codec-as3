@@ -25,5 +25,4 @@ ns.appendBytes(bytes);
 
 *  視頻壓縮
 *  支持多種封裝
-*  rtmp視頻流解析
-*  ts流解析
+*  ts
