@@ -35,9 +35,9 @@ package cc.minos.codec.utils {
 
 		private static function output(...rest):void
 		{
-			if (ExternalInterface.available)
-				ExternalInterface.call.apply(null, new Array('console.log').concat(rest));
-			else
+//			if (ExternalInterface.available)
+//				ExternalInterface.call.apply(null, new Array('console.log').concat(rest));
+//			else
 				trace.apply(null, rest);
 		}
 	}

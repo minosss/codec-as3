@@ -87,8 +87,6 @@ package cc.minos.codec.flv {
 		//记录meta关键帧数据位置
 		private var filepositionsPos:uint;
 		private var timesPos:uint;
-		//关键帧列表（时间，位移）
-//		private var keyframesList:Array;
 
 		public function FlvCodec()
 		{

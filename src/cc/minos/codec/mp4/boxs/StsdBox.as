@@ -6,9 +6,9 @@
 package cc.minos.codec.mp4.boxs {
 
     import cc.minos.codec.mp4.Mp4;
-    import cc.minos.codec.utils.ByteArrayUtil;
+	import cc.minos.codec.utils.Hex;
 
-    import flash.utils.ByteArray;
+	import flash.utils.ByteArray;
 
     CONFIG::LOGGING{
         import cc.minos.codec.utils.Log;
@@ -86,7 +86,7 @@ package cc.minos.codec.mp4.boxs {
                 //size
                 trace('size: ' + data.readUnsignedInt());
                 //type
-                trace('type: ' + ByteArrayUtil.toString(data.readUnsignedInt().toString(16)));
+                trace('type: ' + Hex.toUTF8String(data.readUnsignedInt().toString(16)));
                 offset = data.position;
                 trace('version: ' + data.readByte());
                 trace('profile: ' + data.readUnsignedByte());
