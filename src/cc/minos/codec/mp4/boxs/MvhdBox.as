@@ -41,7 +41,7 @@ package cc.minos.codec.mp4.boxs {
          */
         public function get duration():Number
         {
-            return _duration / _timescale;
+            return parseFloat((_duration / _timescale).toFixed(3));
         }
 
         /**

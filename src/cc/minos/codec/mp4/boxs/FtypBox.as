@@ -4,48 +4,51 @@
  * Date: 14/12/8 16:41
  */
 package cc.minos.codec.mp4.boxs {
-    import cc.minos.codec.mp4.Mp4;
 
-    public class FtypBox extends Box {
+	import cc.minos.codec.mp4.Mp4;
 
-        private var _majorBrand:String;
-        private var _minorVersion:uint;
-        private var _compatibleBrands:Array;
+	CONFIG::LOGGING{
+		import cc.minos.codec.utils.Log;
+	}
 
-        public function FtypBox()
-        {
-            super(Mp4.BOX_TYPE_FTYP);
-        }
+	public class FtypBox extends Box {
 
-        override protected function init():void
-        {
-            //
-            trace( 'ftyp box ===== ');
+		private var _majorBrand:String;
+		private var _minorVersion:uint;
+		private var _compatibleBrands:Array;
 
-            data.position = 8;
-            _majorBrand = data.readUTFBytes(4);
-            _minorVersion = data.readUnsignedInt();
+		public function FtypBox()
+		{
+			super(Mp4.BOX_TYPE_FTYP);
+		}
 
-            trace('majorBrand: ' + _majorBrand);
-            trace('minorVersion: ' + _minorVersion );
+		override protected function init():void
+		{
+			data.position = 8;
+			_majorBrand = data.readUTFBytes(4);
+			_minorVersion = data.readUnsignedInt();
+			_compatibleBrands = [];
+			while (data.bytesAvailable >= 4)
+			{
+				_compatibleBrands.push(data.readUTFBytes(4));
+			}
 
-            _compatibleBrands = [];
-            while( data.bytesAvailable >= 4)
-            {
-                _compatibleBrands.push(data.readUTFBytes(4));
-            }
-            trace('brands: ' + _compatibleBrands );
+			CONFIG::LOGGING{
+				Log.info('[ftyp]');
+				Log.info('majorBrand: ' + _majorBrand);
+				Log.info('minorVersion: ' + _minorVersion);
+				Log.info('brands: ' + _compatibleBrands);
+			}
+		}
 
-        }
+		public function get majorBrand():String
+		{
+			return _majorBrand;
+		}
 
-        public function get majorBrand():String
-        {
-            return _majorBrand;
-        }
-
-        public function get minorVersion():uint
-        {
-            return _minorVersion;
-        }
-    }
+		public function get minorVersion():uint
+		{
+			return _minorVersion;
+		}
+	}
 }

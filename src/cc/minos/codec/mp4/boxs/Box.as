@@ -6,7 +6,7 @@
 package cc.minos.codec.mp4.boxs {
 
 	import cc.minos.codec.mp4.Mp4;
-	import cc.minos.codec.utils.ByteArrayUtil;
+	import cc.minos.codec.utils.Hex;
 
 	import flash.utils.ByteArray;
 
@@ -151,7 +151,7 @@ package cc.minos.codec.mp4.boxs {
 
 		public function toString():String
 		{
-			return '[ ' + ByteArrayUtil.toString(type.toString(16)) + ' Box, size: ' + size + ' ]';
+			return '[ ' + Hex.toUTF8String(type.toString(16)) + ' Box, size: ' + size + ' ]';
 		}
 
 		/*public static function findBox( data:ByteArray, type:uint ):Box

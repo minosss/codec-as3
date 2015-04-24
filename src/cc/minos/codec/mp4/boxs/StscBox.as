@@ -21,7 +21,6 @@ package cc.minos.codec.mp4.boxs {
 
         override protected function init():void
         {
-//            trace('stsc ======');
             data.position = 12;
             _count = data.readUnsignedInt();
             for(var i:int = 0; i < _count; i++)
@@ -32,7 +31,6 @@ package cc.minos.codec.mp4.boxs {
                     'sdi': data.readUnsignedInt()
                 })
             }
-//            trace('entrys: ' + entrys.length );
         }
 
         public function get entrys():Vector.<Object>

@@ -20,7 +20,6 @@ package cc.minos.codec.mp4.boxs {
 		override protected function init():void
 		{
 			data.position = 12;
-			trace('stts =====');
 			_count = data.readUnsignedInt();
 			_entries = [];
 			var sampleCount:uint = 0;

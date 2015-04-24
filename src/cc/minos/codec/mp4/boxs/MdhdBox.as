@@ -20,8 +20,6 @@ package cc.minos.codec.mp4.boxs {
         override protected function init():void
         {
             data.position = 8;
-            //
-            trace('mdhd ========');
             _version = data.readUnsignedByte();
             if(_version == 1)
             {
@@ -33,7 +31,7 @@ package cc.minos.codec.mp4.boxs {
                 _timeScale = data.readUnsignedInt();
                 _duration = data.readUnsignedInt();
             }
-            trace('scale: ' + _timeScale, 'duration: ' + _duration );
+//            trace('scale: ' + _timeScale, 'duration: ' + _duration );
         }
 
         public function get timeScale():uint
