@@ -25,49 +25,42 @@ package cc.minos.codec.mp4.boxs {
 
         override protected function init():void
         {
-            trace('tkhd ============');
-
-            data.position = 0;
-            trace('size: ' + data.readUnsignedInt());
-            trace('type: ' + data.readUTFBytes(4));
-
+            data.position = 8;
             _version = data.readUnsignedByte();
-//            trace('version: ' + data.readUnsignedByte() );
-
             _flags = ( (data.readUnsignedShort() << 8) | data.readUnsignedByte() );
-//            trace('flags: ' + ( (data.readUnsignedShort() << 8) | data.readUnsignedByte() ));
 
-            var d:Date = new Date(Date.UTC(1904, 0, 1)); //from 1904
-            d.secondsUTC = data.readUnsignedInt();
-            trace('creation time: ' + SimpleDateFormatter.formatDate( d, 'yyyy-MM-dd kk:mm:ss') );
+            var creationTime:Date = new Date(Date.UTC(1904, 0, 1)); //from 1904
+            creationTime.secondsUTC = data.readUnsignedInt();
+//            trace('creation time: ' + SimpleDateFormatter.formatDate( creationTime, 'yyyy-MM-dd kk:mm:ss') );
 
-            d = new Date(Date.UTC(1904, 0, 1)); //from 1904
-            d.secondsUTC = data.readUnsignedInt();
-            trace('modification time: ' + SimpleDateFormatter.formatDate( d, 'yyyy-MM-dd kk:mm:ss') );
+            var modificationTime = new Date(Date.UTC(1904, 0, 1)); //from 1904
+            modificationTime.secondsUTC = data.readUnsignedInt();
+//            trace('modification time: ' + SimpleDateFormatter.formatDate( modificationTime, 'yyyy-MM-dd kk:mm:ss') );
 
             _id = data.readUnsignedInt();
 //            trace('id: ' + data.readUnsignedInt());
-            trace('reserved: ' + data.readUnsignedInt() );
+//            trace('reserved: ' + data.readUnsignedInt() );
+            data.readUnsignedInt();
 
             _duration = data.readUnsignedInt();
-            trace('duration: ' + _duration );
+//            trace('duration: ' + _duration );
 
-            data.position += 8;
+            data.position += 12;
 
-            trace('layer: ' + data.readShort() );
-            trace('group: ' + data.readShort() );
+//            trace('layer: ' + data.readShort() );
+//            trace('group: ' + data.readShort() );
 
             _volume = data.readShort() / Mp4.FIXED_POINT_8_8;
 //            trace('volume: ' + data.readShort() / 256.0 );
-            trace('reserved: ' + data.readShort() );
+//            trace('reserved: ' + data.readShort() );
 
-            data.position += 36;
+            data.position += 38;
 
             _width = data.readInt() / Mp4.FIXED_POINT_16_16;
             _height = data.readInt() / Mp4.FIXED_POINT_16_16;
 
-            trace('width: ' + _width );
-            trace('height: ' + _height );
+//            trace('width: ' + _width );
+//            trace('height: ' + _height );
 
         }
 

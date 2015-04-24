@@ -49,14 +49,6 @@ package cc.minos.codec.mp4 {
 			else if(a.index > b.index){
 				return 1;
 			}
-			/*if (a.timestamp < b.timestamp)
-			{
-				return -1;
-			}
-			else if (a.timestamp > b.timestamp)
-			{
-				return 1;
-			}*/
 			if (a.dataType == 0x09)
 			{
 				return -1;

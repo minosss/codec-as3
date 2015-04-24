@@ -18,7 +18,6 @@ package cc.minos.codec.mp4.boxs {
 
 		override protected function init():void
 		{
-			trace("======== ctts box =======")
 			data.position = 12;
 			_count = data.readUnsignedInt(); //
 			_entries = [];
@@ -33,7 +32,6 @@ package cc.minos.codec.mp4.boxs {
 					_entries.push(sampleOffset);
 				}
 			}
-			trace("ctts sample offset count: " + _entries.length);
 		}
 
 		public function get count():uint
