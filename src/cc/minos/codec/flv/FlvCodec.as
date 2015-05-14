@@ -5,6 +5,7 @@
 package cc.minos.codec.flv {
 
 	import cc.minos.codec.Codec;
+
 	import flash.utils.ByteArray;
 
 	/**
@@ -234,29 +235,32 @@ package cc.minos.codec.flv {
 
 		/**
 		 * 写入视频节点
-		 * @param s			:	目标流
-		 * @param data		:	数据
-		 * @param timestamp :	时间戳
-		 * @param frameType :	帧类型，占4位（1是关键帧，2则不是）
-		 * @param codecId	:	编码类型，占后4位（7则是avc）
-		 * @param naluType	:	NALU类型，avc的数据开始需要NALU header 0后续都是1
-		 * @param flagsSize	:	数据头标签占位
+		 * @param s            :    目标流
+		 * @param data        :    数据
+		 * @param timestamp :    时间戳
+		 * @param frameType :    帧类型，占4位（1是关键帧，2则不是）
+		 * @param codecId    :    编码类型，占后4位（7则是avc）
+		 * @param naluType    :    NALU类型，avc的数据开始需要NALU header 0后续都是1
+		 * @param flagsSize    :    数据头标签占位
 		 */
 		private function byte_video(s:*, data:ByteArray, timestamp:Number, frameType:uint, codecId:uint, naluType:uint = 1, flagsSize:uint = 5):void
 		{
 			var tag:ByteArray = new ByteArray();
 			byte_w8(tag, FlvCodec.TAG_TYPE_VIDEO); //tag type
-			byte_wb24(tag, data.length + flagsSize ); //data size
+			byte_wb24(tag, data.length + flagsSize); //data size
 			byte_wb24(tag, timestamp); //ts
 			byte_w8(tag, 0); //ts ext
 			byte_wb24(tag, 0); //stream id
 			//avc data
 			byte_w8(tag, (frameType + codecId)); //
-			byte_w8(tag, naluType);
-			byte_wb24(tag, 0); //ct
+			if (codecId == FlvCodec.VIDEO_CODECID_H264)
+			{
+				byte_w8(tag, naluType);
+				byte_wb24(tag, 0); //ct
+			}
 			tag.writeBytes(data);
 			//保存關鍵幀的信息
-			if (frameType == VIDEO_FRAME_KEY && _keyframes )
+			if (frameType == VIDEO_FRAME_KEY && _keyframes)
 			{
 				_keyframes.push({'time': parseFloat((timestamp / 1000).toFixed(2)), 'position': s.position});
 			}
@@ -268,18 +272,18 @@ package cc.minos.codec.flv {
 
 		/**
 		 * 音频流节点
-		 * @param s			:	目标流
-		 * @param data		:	数据
-		 * @param timestamp	:	时间戳
-		 * @param prop		:	音频标识（类型，赫兹，声道等）
-		 * @param packetType:	类型AAC一样需要分header0和body1
-		 * @param flagsSize	:	标签头占位
+		 * @param s            :    目标流
+		 * @param data        :    数据
+		 * @param timestamp    :    时间戳
+		 * @param prop        :    音频标识（类型，赫兹，声道等）
+		 * @param packetType:    类型AAC一样需要分header0和body1
+		 * @param flagsSize    :    标签头占位
 		 */
 		private function byte_audio(s:*, data:ByteArray, timestamp:Number, prop:uint, packetType:uint = 1, flagsSize:uint = 2):void
 		{
 			var tag:ByteArray = new ByteArray();
 			byte_w8(tag, FlvCodec.TAG_TYPE_AUDIO);
-			byte_wb24(tag, data.length + flagsSize );
+			byte_wb24(tag, data.length + flagsSize);
 			byte_wb24(tag, timestamp); //ts
 			byte_w8(tag, 0); //ts ext
 			byte_wb24(tag, 0); //stream
@@ -296,8 +300,8 @@ package cc.minos.codec.flv {
 
 		/**
 		 * 把其他流封裝成flv
-		 * @param input	輸入流
-		 * @return	返回flv封裝的二進制
+		 * @param input    輸入流
+		 * @return    返回flv封裝的二進制
 		 */
 		override public function encode(input:Codec):ByteArray
 		{
@@ -324,14 +328,14 @@ package cc.minos.codec.flv {
 			for (var i:int = 0; i < input.frames.length; i++)
 			{
 				var f:Frame = input.frames[i];
-				if ( input.hasVideo && f.dataType == FlvCodec.TAG_TYPE_VIDEO )
-					byte_video(flv, input.getDataByFrame(f), f.timestamp, f.frameType, FlvCodec.VIDEO_CODECID_H264);
-				else if( input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO )
+				if (input.hasVideo && f.dataType == FlvCodec.TAG_TYPE_VIDEO)
+					byte_video(flv, input.getDataByFrame(f), f.timestamp, f.frameType, f.codecId, 1);
+				else if (input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO)
 					byte_audio(flv, input.getDataByFrame(f), f.timestamp, flags);
 			}
 
 			//根据获取到的关键帧数组，更新meta的数据
-			if ( _keyframes && _keyframes.length > 0)
+			if (_keyframes && _keyframes.length > 0)
 			{
 				flv.position = timesPos;
 				for (var k:uint = 0; k < _keyframes.length; k++)
@@ -392,7 +396,7 @@ package cc.minos.codec.flv {
 				end = _rawData.position + step + 3;
 				tagLength = end - offset;
 
-				if ( currentTag == TAG_TYPE_META || currentTag == TAG_TYPE_AUDIO || currentTag == TAG_TYPE_VIDEO)
+				if (currentTag == TAG_TYPE_META || currentTag == TAG_TYPE_AUDIO || currentTag == TAG_TYPE_VIDEO)
 				{
 					frame = new Frame('flv');
 					frame.dataType = currentTag;
@@ -415,7 +419,7 @@ package cc.minos.codec.flv {
 //                    (bodyTagHeader >> 1 & 0x1 ); //sound size 0/1(8b/16b)
 //                    (bodyTagHeader & 0x1 ); //sound type 0/1
 					}
-					else if ( currentTag == TAG_TYPE_META )
+					else if (currentTag == TAG_TYPE_META)
 					{
 						//parse meta data -> video params
 					}
