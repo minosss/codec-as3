@@ -6,9 +6,9 @@
 package cc.minos.codec.mp4.boxs {
 
     import cc.minos.codec.mp4.Mp4;
-	import cc.minos.codec.utils.Hex;
-
-	import flash.utils.ByteArray;
+    import cc.minos.codec.utils.Hex;
+    
+    import flash.utils.ByteArray;
 
     CONFIG::LOGGING{
         import cc.minos.codec.utils.Log;
@@ -145,20 +145,24 @@ package cc.minos.codec.mp4.boxs {
                 var dsSize:uint = data.readUnsignedInt();
                 var dsType:uint = data.readUnsignedInt();
 
-                //0x03 0x04 0x05
-                while( data.bytesAvailable > 0 )
-                {
-                    offset = data.position;
-                    if( data.readByte() == 0x05 ){
+//              data.readUnsignedInt();		// version and flags
+//              data.readUnsignedInt(); // ES descriptor (and extended) type tag
+//              data.readUnsignedByte(); // descriptor type length
+//              data.readUnsignedShort();	// ES ID
+//              data.readUnsignedByte();	// stream priority
+//              data.readUnsignedInt();		// decoder config (and extended) descriptor type tag
+//              data.readUnsignedByte();	// descriptor type length
+//              data.readUnsignedByte();	// object type ID
+//              data.readUnsignedByte();	// stream type and upstream flag and reserved flag
+//              data.readUnsignedShort();
+//              data.readUnsignedByte();	// buffer size, 24-bit
+//              data.readUnsignedInt();	// maximum bit rate
+//              data.readUnsignedInt();	// average bit rate
+//              data.readUnsignedInt();		// decoder specific (and extended) descriptor type tag
 
-                        if( data.readUnsignedByte() == 0x80 ){
-                            data.position += 2;
-                            offset += 3;
-                        }
-                        _configurationData.writeBytes( data, offset + 2, data.readUnsignedByte() ); //audio specific
-                        break;
-                    }
-                }
+                data.position += 34;
+                offset = data.position;
+                _configurationData.writeBytes( data, offset + 1, data.readUnsignedByte() )
             }
             //
             data.position = data.length;
