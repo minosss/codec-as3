@@ -329,7 +329,7 @@ package cc.minos.codec.flv {
 			{
 				var f:Frame = input.frames[i];
 				if (input.hasVideo && f.dataType == FlvCodec.TAG_TYPE_VIDEO)
-					byte_video(flv, input.getDataByFrame(f), f.timestamp, f.frameType, f.codecId, 1);
+					byte_video(flv, input.getDataByFrame(f), f.timestamp, f.frameType, FlvCodec.VIDEO_CODECID_H264, 1);
 				else if (input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO)
 					byte_audio(flv, input.getDataByFrame(f), f.timestamp, flags);
 			}
