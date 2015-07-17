@@ -145,23 +145,63 @@ package cc.minos.codec.mp4.boxs {
                 var dsSize:uint = data.readUnsignedInt();
                 var dsType:uint = data.readUnsignedInt();
 
-                //0x03 0x04 0x05
-                while( data.bytesAvailable > 0 )
-                {
-                    offset = data.position;
-                    if( data.readByte() == 0x05 ){
-
-                        if( data.readUnsignedByte() == 0x80 ){
-                            data.position += 2;
-                            offset += 3;
-                        }
-                        _configurationData.writeBytes( data, offset + 2, data.readUnsignedByte() ); //audio specific
-                        break;
-                    }
-                }
+                if(dsType == Mp4.BOX_TYPE_ESDS)
+                    readEsds();
             }
             //
             data.position = data.length;
+        }
+
+        private function readEsds():void
+        {
+            var offset:uint;
+
+            data.position += 4; //8-bit hex version + 24-bit hex flags
+
+            //ES descriptor
+            if (data.readUnsignedByte() == 0x03)
+            {
+                skipExtended(); //
+                data.readUnsignedByte(); //length
+                data.readUnsignedShort(); //ES ID
+                data.readUnsignedByte(); //stream priority
+
+                //decoder config descriptor
+                if (data.readUnsignedByte() == 0x04)
+                {
+                    skipExtended(); //
+                    data.readUnsignedByte(); //length
+                    data.readUnsignedByte(); //object type ID
+                    /*
+                     - type IDs are MPEG-4 video = 32 ; MPEG-4 AVC SPS = 33
+                     - type IDs are MPEG-4 AVC PPS = 34 ; MPEG-4 audio = 64
+                     ...
+                     */
+                    //6 bits stream type + 1 bit upstream flag + 1 bit reserved flag
+                    //3 bytes buffer size
+                    //4 bytes maximum bit rate
+                    //4 bytes average bit rate
+                    data.position += 12; //skip
+                    //decoder specific descriptor
+                    if (data.readUnsignedByte() == 0x05)
+                    {
+                        skipExtended(); //
+                        var len:uint = data.readUnsignedByte(); //length
+                        _configurationData.writeBytes(data, data.position, len);//
+                    }
+                    //SL config descriptor => 0x06
+                }
+            }
+        }
+
+        private function skipExtended():void
+        {
+            while (true)
+            {
+                if(data.readUnsignedByte() != 0x80)
+                    break;
+            }
+            data.position += -1;
         }
 
         public function get configurationData():ByteArray
