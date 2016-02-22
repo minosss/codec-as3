@@ -1,10 +1,9 @@
 Codec-AS3
 =========
 
+## 说明
+
 `NetStream.appendBytes()`只支持FLV封裝的格式，在需要播放其他封裝的視頻的話，就必須將其他封裝格式轉成FLV的封裝。
-
->起初我只是想解析webm，可到现在还是没解析完成，而mp4的资料比较多所以mp4的已经ok~ 其他格式估计暂时也不会研究~ 毕竟工作不是研究视频的= = 
-
 
 ## 格式
 
@@ -20,13 +19,6 @@ mp4.decode(mp4bytes);
 var bytes:ByteArray = new FlvCodec().encode(mp4);
 ns.appendBytes(bytes);
 ```
-
-## 更新路线
-
-*  压缩
-*  mkv解析
-*  hls流
-*  scoket
 
 ## 许可证
 
