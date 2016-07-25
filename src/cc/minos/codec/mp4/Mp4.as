@@ -4,7 +4,24 @@
  * Date: 14/12/8 16:30
  */
 package cc.minos.codec.mp4 {
-    import cc.minos.codec.mp4.boxs.*;
+    import cc.minos.codec.mp4.boxs.Box;
+    import cc.minos.codec.mp4.boxs.CttsBox;
+    import cc.minos.codec.mp4.boxs.EdtsBox;
+    import cc.minos.codec.mp4.boxs.FtypBox;
+    import cc.minos.codec.mp4.boxs.HdlrBox;
+    import cc.minos.codec.mp4.boxs.MdatBox;
+    import cc.minos.codec.mp4.boxs.MdhdBox;
+    import cc.minos.codec.mp4.boxs.MoovBox;
+    import cc.minos.codec.mp4.boxs.MvhdBox;
+    import cc.minos.codec.mp4.boxs.StblBox;
+    import cc.minos.codec.mp4.boxs.StcoBox;
+    import cc.minos.codec.mp4.boxs.StscBox;
+    import cc.minos.codec.mp4.boxs.StsdBox;
+    import cc.minos.codec.mp4.boxs.StssBox;
+    import cc.minos.codec.mp4.boxs.StszBox;
+    import cc.minos.codec.mp4.boxs.SttsBox;
+    import cc.minos.codec.mp4.boxs.TkhdBox;
+    import cc.minos.codec.mp4.boxs.TrakBox;
 
     public class Mp4 {
 
@@ -167,7 +184,6 @@ package cc.minos.codec.mp4 {
                 case BOX_TYPE_MINF:
                 case BOX_TYPE_UDTA:
                 case BOX_TYPE_IODS:
-                case BOX_TYPE_EDTS:
                 case BOX_TYPE_VMHD:
                 case BOX_TYPE_SMHD:
                 case BOX_TYPE_DINF:
@@ -175,6 +191,10 @@ package cc.minos.codec.mp4 {
                 case BOX_TYPE_FREE:
                     box = new Box(type);
                     break;
+				
+				case BOX_TYPE_EDTS:
+					box = new EdtsBox();
+					break;
                 default :
                     trace('[MP4::getBox] 0x' + type.toString(16) + ' not defined.');
             }

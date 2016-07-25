@@ -29,6 +29,7 @@ package cc.minos.codec.mp4.boxs {
                 data.readUnsignedInt(); //modification time
                 _timescale = data.readUnsignedInt();
                 _duration = data.readUnsignedInt();
+				trace("ddd")
             }
             else if( _version == 1 )
             {

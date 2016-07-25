@@ -4,9 +4,9 @@
  */
 package cc.minos.codec.flv {
 
-	import cc.minos.codec.Codec;
-
 	import flash.utils.ByteArray;
+	
+	import cc.minos.codec.Codec;
 
 	/**
 	 * ...
@@ -189,7 +189,7 @@ package cc.minos.codec.flv {
 					byte_string(header, 'hasKeyframes');
 					byte_boolean(header, _hasKey);
 
-					var _len:uint = input.keyframes.length + 1;
+					var _len:uint = input.keyframes.length;
 					byte_string(header, 'keyframes');
 					byte_w8(header, AMF_DATA_TYPE_OBJECT);
 
@@ -200,7 +200,9 @@ package cc.minos.codec.flv {
 					filepositionsPos = header.position;
 					for (var i:int = 0; i < _len; i++)
 					{
-						byte_number(header, 0.0);
+//						trace(i,input.keyframes[i].time, input.keyframes[i].position)
+						byte_number(header, input.keyframes[i].position);
+//						byte_number(header, 0.0);
 					}
 
 					byte_string(header, 'times');
@@ -210,7 +212,8 @@ package cc.minos.codec.flv {
 					timesPos = header.position;
 					for (var i:int = 0; i < _len; i++)
 					{
-						byte_number(header, 0.0);
+//						byte_number(header, 0.0);
+						byte_number(header, input.keyframes[i].time);
 					}
 					//object end
 					byte_wb24(header, AMF_DATA_TYPE_OBJECT_END);
@@ -262,7 +265,7 @@ package cc.minos.codec.flv {
 			//保存關鍵幀的信息
 			if (frameType == VIDEO_FRAME_KEY && _keyframes)
 			{
-				_keyframes.push({'time': parseFloat((timestamp / 1000).toFixed(2)), 'position': s.position});
+//				_keyframes.push({'time': parseFloat((timestamp / 1000).toFixed(2)), 'position': s.position});
 			}
 			//add tag and pre tag size
 			s.writeBytes(tag), byte_wb32(s, tag.length);
@@ -297,6 +300,125 @@ package cc.minos.codec.flv {
 
 			tag.length = 0, tag = null;
 		}
+		
+		private var flv:ByteArray;
+		private var _index:int = 0;
+
+		private var str:String = "";
+
+		private var _flags:uint;
+		public function streamEncode(input:Codec):ByteArray
+		{
+			
+			if(flv == null)
+			{
+				flv = new ByteArray();
+				//文件头
+				byte_header(flv, input);
+				//这里是pps和sps，avc重要的组成部分，在文件的开头meta的后面，一定是关键帧
+				if (input.videoConfig)
+				{
+					byte_video(flv, input.videoConfig, 0, FlvCodec.VIDEO_FRAME_KEY, FlvCodec.VIDEO_CODECID_H264, 0);
+				}
+				//音频解析的部分，接着视频的解析数据
+				_flags = 0;
+				_flags = AUDIO_CODECID_AAC;
+				_flags += AUDIO_SAMPLERATE_44100HZ;
+				_flags += AUDIO_SAMPLESSIZE_16BIT;
+				_flags += AUDIO_CHANNEL_STEREO;
+				if (input.audioConfig)
+				{
+					byte_audio(flv, input.audioConfig, 0, _flags, 0);
+				}
+				
+			}
+			
+//			trace(this,_flags)
+			while(true)
+			{
+				if(input.frames.length > _index)
+				{
+					var f:Frame = input.frames[_index];
+					if (input.hasVideo && f.dataType == FlvCodec.TAG_TYPE_VIDEO)
+					{
+						var b:ByteArray = input.getDataByFrame(f);
+						if(b)
+						{
+							byte_video(flv, b, f.timestamp, f.frameType, FlvCodec.VIDEO_CODECID_H264, 1);
+							_index += 1;
+						}
+						else
+						{
+							break;
+						}
+					}
+					else if (input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO)
+					{
+						b = input.getDataByFrame(f);
+						if(b)
+						{
+							byte_audio(flv, b, f.timestamp, _flags);
+							_index++;
+						}
+						else
+						{
+							break;
+						}
+						
+					}
+					else{
+						trace("什么内容")
+					}
+//					trace(this, _index+" ===> " , flv.length);
+					str += _index+" ==> " + flv.length+"\n";
+					
+				}
+				else
+				{
+					break;
+				}
+			}
+			
+			
+			//根据时间添加各个节点
+//			for (var i:int = 0; i < 3; i++)
+//			{
+//				var f:Frame = input.frames[i];
+//				if (input.hasVideo && f.dataType == FlvCodec.TAG_TYPE_VIDEO)
+//				{
+//					var b:ByteArray = input.getDataByFrame(f);
+//					if(b)
+//					{
+//						byte_video(flv, b, f.timestamp, f.frameType, FlvCodec.VIDEO_CODECID_H264, 1);
+//					}
+//				}
+//				else if (input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO)
+//				{
+//					b = input.getDataByFrame(f);
+//					if(b)
+//					{
+//						byte_audio(flv, b, f.timestamp, flags);
+//					}
+//				}
+//			}
+			
+			//根据获取到的关键帧数组，更新meta的数据
+//			if (_keyframes && _keyframes.length > 0)
+//			{
+//				flv.position = timesPos;
+//				for (var k:uint = 0; k < _keyframes.length; k++)
+//				{
+//					byte_number(flv, _keyframes[k].time);
+//				}
+//				flv.position = filepositionsPos;
+//				for (k = 0; k < _keyframes.length; k++)
+//				{
+//					byte_number(flv, _keyframes[k].position);
+//				}
+//			}
+//			flv.position = 0;
+			return flv;
+		}
 
 		/**
 		 * 把其他流封裝成flv
@@ -324,6 +446,7 @@ package cc.minos.codec.flv {
 			{
 				byte_audio(flv, input.audioConfig, 0, flags, 0);
 			}
+			
 			//根据时间添加各个节点
 			for (var i:int = 0; i < input.frames.length; i++)
 			{
@@ -332,8 +455,13 @@ package cc.minos.codec.flv {
 					byte_video(flv, input.getDataByFrame(f), f.timestamp, f.frameType, FlvCodec.VIDEO_CODECID_H264, 1);
 				else if (input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO)
 					byte_audio(flv, input.getDataByFrame(f), f.timestamp, flags);
+				
+				
+//				trace(this, i+" ===> " , flv.length);
+				str += i+" ==> " + flv.length+"\n";
 			}
-
+			
+			
 			//根据获取到的关键帧数组，更新meta的数据
 			if (_keyframes && _keyframes.length > 0)
 			{

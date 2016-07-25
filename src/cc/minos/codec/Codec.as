@@ -126,8 +126,14 @@ package cc.minos.codec {
 		public function getDataByFrame(frame:Frame):ByteArray
 		{
 			var b:ByteArray = new ByteArray();
-			b.writeBytes(_rawData, frame.offset, frame.size);
-			return b;
+			if(_rawData.length >= frame.offset + frame.size)
+			{
+				b.writeBytes(_rawData, frame.offset, frame.size);
+//				trace(this,_rawData.bytesAvailable, _rawData.position, _rawData.length);
+				return b;
+			}
+//			trace(this,_rawData.bytesAvailable, _rawData.position);
+			return null;
 		}
 
 		public function export():ByteArray
