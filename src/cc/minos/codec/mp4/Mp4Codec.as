@@ -160,17 +160,13 @@ package cc.minos.codec.mp4 {
 			while (_rawData.bytesAvailable > 8)
 			{
 				$offset = _rawData.position;
-				if(!_waiting)		//重复读取的问题
-				{
-					
-				}
 				for(var i:int = 0; i < 4; i++)
 				{
-					size = (size<<8)+_rawData[$offset+i];
+					size = (size << 8) + _rawData[$offset + i];
 				}
 				for(i = 4; i < 8; i++)
 				{
-					type = (type<<8)+_rawData[$offset+i];
+					type = (type << 8) + _rawData[$offset + i];
 				}
 				
 				if ($type == Mp4.BOX_TYPE_MOOV || type == Mp4.BOX_TYPE_MOOV)
@@ -180,7 +176,6 @@ package cc.minos.codec.mp4 {
 						$size = _rawData.readUnsignedInt();
 						$type = _rawData.readUnsignedInt();
 					}
-//					trace(_rawData.bytesAvailable, $size - $offset)
 					if(_rawData.bytesAvailable >= $size - $offset)
 					{
 						var d:ByteArray = new ByteArray();
@@ -213,7 +208,7 @@ package cc.minos.codec.mp4 {
 			
 			
 			//獲取解析的數據
-			for (var i:int = 0; i < moovBox.traks.length; i++)
+			for (i = 0; i < moovBox.traks.length; i++)
 			{
 				var trak:TrakBox = moovBox.traks[i] as TrakBox;
 				if (trak.trakType == Mp4.TRAK_TYPE_VIDE)
@@ -225,7 +220,7 @@ package cc.minos.codec.mp4 {
 					_videoSamples = trak.samples;
 					//-- video sps & pps
 					_videoConfig = trak.stsdBox.configurationData;
-//					_keyframes = trak.keyframes;
+					_keyframes = trak.keyframes;
 					_keyframes = [{time:0.0, position:0.0}];//{time:0.0, position:0.0}
 				}
 				else if (trak.trakType == Mp4.TRAK_TYPE_SOUN)
@@ -248,7 +243,7 @@ package cc.minos.codec.mp4 {
 					_frames.push(v);
 					if(v.frameType == FlvCodec.VIDEO_FRAME_KEY)
 					{
-						_keyframes.push({'time': parseFloat((v.timestamp / 1000).toFixed(2)), 'position': v.offset});
+						_keyframes.push({'time': parseFloat((v.timestamp / 1000).toFixed(2)), 'position': 0});		//取得关键帧的时间，下面会重新计算位置
 					}
 				}
 			}
@@ -259,95 +254,36 @@ package cc.minos.codec.mp4 {
 					_frames.push(a);
 				}
 			}
-			_frames.sort(sortByTime);		//按时间大小排序
-//			_frames.sort(sortByIndex);
-//			_frames.sort(sortOffset);
+//			_frames.sort(sortByTime);		//按时间大小排序
+//			_frames.sort(sortByIndex);		//按索引排序
+			_frames.sort(sortOffset);		//按偏移排序
 			
-//			_keyframes.unshift({'time':0.0, 'position':1373})
+			var index:int = 1;
+			var ps:uint = 0;
+			
+			//计算关键帧的偏移量offset 封装flv的时候会把开始位置加上去才是真的position		这里可以考虑改进
+			for(i = 0; i < _frames.length; i++)
+			{
+				if(_frames[i].dataType == FlvCodec.TAG_TYPE_AUDIO)
+				{
+					ps +=  _frames[i].size + 2 + 15;
+				}
+				else if(_frames[i].dataType == FlvCodec.TAG_TYPE_VIDEO)
+				{
+					ps +=  _frames[i].size + 5 + 15;
+				}
+				else
+				{
+					trace("错误");
+				}
+				
+				if(_frames[i].frameType == FlvCodec.VIDEO_FRAME_KEY)
+				{
+					_keyframes[index].position = ps -_frames[i].size - 5;
+					index++;
+				}
+			}
 			_hadHeadMeata = true;
-			return this;
-		}
-
-		/**
-		 * 解析
-		 * @param input
-		 * @return
-		 */
-		override public function decode(input:ByteArray):Codec
-		{
-			if (!probe(input))
-				throw new Error('Not a valid MP4 file!');
-
-			this._rawData = input;
-			//find moov box
-			//直接搜moov解析
-			var offset:uint;
-			var size:uint;
-			var type:uint;
-			_rawData.position = 0;
-			while (_rawData.bytesAvailable > 8)
-			{
-				offset = _rawData.position;
-				size = _rawData.readUnsignedInt();
-				type = _rawData.readUnsignedInt();
-				if (type == Mp4.BOX_TYPE_MOOV)
-				{
-					var d:ByteArray = new ByteArray();
-					d.writeBytes(_rawData, offset, size);
-					moovBox = new MoovBox();
-					moovBox.size = size;
-					moovBox.position = offset;
-					moovBox.parse(d);
-					break;
-				}
-				_rawData.position = (offset + size);
-			}
-			//
-			_duration = moovBox.mvhdBox.duration;
-			//獲取解析的數據
-			for (var i:int = 0; i < moovBox.traks.length; i++)
-			{
-				var trak:TrakBox = moovBox.traks[i] as TrakBox;
-				if (trak.trakType == Mp4.TRAK_TYPE_VIDE)
-				{
-					_hasVideo = true;
-					_videoWidth = trak.stsdBox.videoWidth;
-					_videoHeight = trak.stsdBox.videoHeight;
-					_frameRate = trak.framerate;
-					_videoSamples = trak.samples;
-					//-- video sps & pps
-					_videoConfig = trak.stsdBox.configurationData;
-					_keyframes = trak.keyframes;
-				}
-				else if (trak.trakType == Mp4.TRAK_TYPE_SOUN)
-				{
-					_hasAudio = true;
-					_audioChannels = trak.stsdBox.audioChannels;
-					_audioRate = trak.stsdBox.audioRate;
-					_audioSize = trak.stsdBox.audioSize;
-					_audioSamples = trak.samples;
-					//-- audio spec
-					_audioConfig = trak.stsdBox.configurationData;
-				}
-			}
-			//根據時間戳排列幀
-			_frames = new Vector.<Frame>();
-			if (_videoSamples != null)
-			{
-				for each(var v:Frame in _videoSamples)
-				{
-					_frames.push(v);
-				}
-			}
-			if (_audioSamples != null)
-			{
-				for each(var a:Frame in _audioSamples)
-				{
-					_frames.push(a);
-				}
-			}
-			_frames.sort(sortByIndex);
-
 			return this;
 		}
 

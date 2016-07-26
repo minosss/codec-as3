@@ -119,7 +119,7 @@ package cc.minos.codec.flv {
 		 * @param s
 		 * @param input
 		 */
-		private function byte_header(s:*, input:Codec):void
+		private function byte_header(s:*, input:Codec, avcLen:int = 0, fAudioLen:int = 0):void
 		{
 			var header:ByteArray = new ByteArray();
 			//开头固定的3个字节
@@ -198,19 +198,28 @@ package cc.minos.codec.flv {
 					byte_wb32(header, _len); //count
 
 					filepositionsPos = header.position;
+					
+					var headLen:int = header.length + _len*9 + 7 + 1 + 4 + _len * 9 + 3 + 7;	//flv metadata + 头长度 就是第一个特殊关键帧的起始位置
+					input.keyframes[0].position = headLen;
+					var offPostion:uint = headLen + avcLen + 15 + fAudioLen; //flv metadata + 头长度 + 第一个帧的长度 +第一个音频的长度就是后续的关键帧的起始偏移量
 					for (var i:int = 0; i < _len; i++)
 					{
-//						trace(i,input.keyframes[i].time, input.keyframes[i].position)
-						byte_number(header, input.keyframes[i].position);
-//						byte_number(header, 0.0);
+						if(i == 0)
+						{
+							byte_number(header, input.keyframes[i].position);
+						}
+						else
+						{
+							byte_number(header, input.keyframes[i].position + offPostion);
+						}
 					}
 
-					byte_string(header, 'times');
+					byte_string(header, 'times');		//7
 					byte_w8(header, AMF_DATA_TYPE_ARRAY);
 					byte_wb32(header, _len); //count
 
 					timesPos = header.position;
-					for (var i:int = 0; i < _len; i++)
+					for (i = 0; i < _len; i++)
 					{
 //						byte_number(header, 0.0);
 						byte_number(header, input.keyframes[i].time);
@@ -221,7 +230,7 @@ package cc.minos.codec.flv {
 					metadataCount++;
 				}
 			}
-			byte_wb24(header, AMF_END_OF_OBJECT);
+			byte_wb24(header, AMF_END_OF_OBJECT);	//3
 
 			//更新meta的数据
 			header.position = metadataCountPos;
@@ -231,7 +240,7 @@ package cc.minos.codec.flv {
 			header.position = header.length;
 
 			s.writeBytes(header);
-			byte_wb32(s, header.length - 13);
+			byte_wb32(s, header.length - 13);		//4
 
 			header.length = 0, header = null;
 		}
@@ -307,14 +316,19 @@ package cc.minos.codec.flv {
 		private var str:String = "";
 
 		private var _flags:uint;
+		
+		
 		public function streamEncode(input:Codec):ByteArray
 		{
 			
 			if(flv == null)
 			{
 				flv = new ByteArray();
+				var avcLen:int = input.videoConfig.length + 5;			//特殊关键帧
+				var fAudioLen:int = input.audioConfig.length + 2;		//特殊音频帧
 				//文件头
-				byte_header(flv, input);
+				byte_header(flv, input, avcLen, fAudioLen);
+				
 				//这里是pps和sps，avc重要的组成部分，在文件的开头meta的后面，一定是关键帧
 				if (input.videoConfig)
 				{
@@ -330,7 +344,6 @@ package cc.minos.codec.flv {
 				{
 					byte_audio(flv, input.audioConfig, 0, _flags, 0);
 				}
-				
 			}
 			
 //			trace(this,_flags)
@@ -367,10 +380,8 @@ package cc.minos.codec.flv {
 						
 					}
 					else{
-						trace("什么内容")
+						trace("其他内容", "是否有声音：" + input.hasAudio , "是否有视频：" + input.hasVideo, "类型：" + f.dataType)
 					}
-//					trace(this, _index+" ===> " , flv.length);
-					str += _index+" ==> " + flv.length+"\n";
 					
 				}
 				else
@@ -378,45 +389,6 @@ package cc.minos.codec.flv {
 					break;
 				}
 			}
-			
-			
-			//根据时间添加各个节点
-//			for (var i:int = 0; i < 3; i++)
-//			{
-//				var f:Frame = input.frames[i];
-//				if (input.hasVideo && f.dataType == FlvCodec.TAG_TYPE_VIDEO)
-//				{
-//					var b:ByteArray = input.getDataByFrame(f);
-//					if(b)
-//					{
-//						byte_video(flv, b, f.timestamp, f.frameType, FlvCodec.VIDEO_CODECID_H264, 1);
-//					}
-//				}
-//				else if (input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO)
-//				{
-//					b = input.getDataByFrame(f);
-//					if(b)
-//					{
-//						byte_audio(flv, b, f.timestamp, flags);
-//					}
-//				}
-//			}
-			
-			//根据获取到的关键帧数组，更新meta的数据
-//			if (_keyframes && _keyframes.length > 0)
-//			{
-//				flv.position = timesPos;
-//				for (var k:uint = 0; k < _keyframes.length; k++)
-//				{
-//					byte_number(flv, _keyframes[k].time);
-//				}
-//				flv.position = filepositionsPos;
-//				for (k = 0; k < _keyframes.length; k++)
-//				{
-//					byte_number(flv, _keyframes[k].position);
-//				}
-//			}
-//			flv.position = 0;
 			return flv;
 		}
 
@@ -455,10 +427,6 @@ package cc.minos.codec.flv {
 					byte_video(flv, input.getDataByFrame(f), f.timestamp, f.frameType, FlvCodec.VIDEO_CODECID_H264, 1);
 				else if (input.hasAudio && f.dataType == FlvCodec.TAG_TYPE_AUDIO)
 					byte_audio(flv, input.getDataByFrame(f), f.timestamp, flags);
-				
-				
-//				trace(this, i+" ===> " , flv.length);
-				str += i+" ==> " + flv.length+"\n";
 			}
 			
 			
@@ -478,85 +446,6 @@ package cc.minos.codec.flv {
 			}
 			flv.position = 0;
 			return flv;
-		}
-
-		/**
-		 * 解析flv
-		 * @param input
-		 * @return
-		 */
-		override public function decode(input:ByteArray):Codec
-		{
-			if (!probe(input))
-				throw new Error('Not a valid FLV file!');
-
-			_rawData = input;
-			_rawData.position = 0;
-
-			_rawData.readUTFBytes(3); // FLV
-			_rawData.readByte(); //version
-			var info:uint = _rawData.readByte(); //flags
-			_hasAudio = (info >> 2 & 0x1); //audio
-			_hasVideo = (info >> 0 & 0x1); //video
-			_rawData.position += 8; //data offset
-
-			var offset:int;
-			var end:int;
-			var tagLength:int;
-			var currentTag:int;
-			var step:int;
-			var bodyTagHeader:int;
-			var time:int;
-			var timestampExtended:int;
-			var streamID:int;
-			var frame:Frame;
-
-			_frames = new Vector.<Frame>();
-			while (_rawData.bytesAvailable > 0)
-			{
-				offset = _rawData.position;
-				currentTag = _rawData.readByte();
-				step = (_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte();
-				time = (_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte();
-				timestampExtended = _rawData.readUnsignedByte(); //
-				streamID = ((_rawData.readUnsignedShort() << 8) | _rawData.readUnsignedByte());
-				bodyTagHeader = _rawData.readUnsignedByte();
-				end = _rawData.position + step + 3;
-				tagLength = end - offset;
-
-				if (currentTag == TAG_TYPE_META || currentTag == TAG_TYPE_AUDIO || currentTag == TAG_TYPE_VIDEO)
-				{
-					frame = new Frame('flv');
-					frame.dataType = currentTag;
-					frame.offset = offset;
-					frame.size = tagLength;
-					frame.timestamp = time;
-					if (currentTag == TAG_TYPE_VIDEO)
-					{
-						frame.frameType = (bodyTagHeader >> 4); //key or inter ...
-						frame.codecId = (bodyTagHeader & 0xf);//avc... etc
-						//if avc -> pps & sps
-					}
-					else if (currentTag == TAG_TYPE_AUDIO)
-					{
-						frame.frameType = bodyTagHeader; //
-						frame.codecId = (bodyTagHeader >> 4); //aac... etc
-						//if aac -> codec specs ...
-//                    (bodyTagHeader >> 4); //sound format 0-15
-//                    (bodyTagHeader >> 2 & 0x03 ); //sound rate 0/1/2/3(5.5/11/22/44-kHz)
-//                    (bodyTagHeader >> 1 & 0x1 ); //sound size 0/1(8b/16b)
-//                    (bodyTagHeader & 0x1 ); //sound type 0/1
-					}
-					else if (currentTag == TAG_TYPE_META)
-					{
-						//parse meta data -> video params
-					}
-					_frames.push(frame);
-				}
-				_rawData.position = end;
-			}
-
-			return this;
 		}
 
 		/**
