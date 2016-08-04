@@ -6,6 +6,7 @@
 package cc.minos.codec.mp4 {
 
 	import flash.utils.ByteArray;
+	import flash.utils.IDataInput;
 	
 	import cc.minos.codec.Codec;
 	import cc.minos.codec.flv.FlvCodec;
@@ -131,24 +132,23 @@ package cc.minos.codec.mp4 {
 		}
 		
 		
-		public function streamDecode(input:ByteArray):Codec
+		public function streamDecode(input:IDataInput):Codec
 		{
+			input.readBytes(_rawData, _rawData.length)
 			if(_hadHeadMeata)
 			{
-				this._rawData = input;
+//				this._rawData = input;
 				return this;
 			}
 			if(!_waiting)
 			{
-				if (!probe(input))
+				if (!probe(_rawData))
 					throw new Error('Not a valid MP4 file!');
-				this._rawData = input;
 				_rawData.position = 0;
 				//find moov box
 				//直接搜moov解析
 			}
 			
-			this._rawData = input;
 			
 			
 			var size:int;
@@ -295,6 +295,123 @@ package cc.minos.codec.mp4 {
 		override public function encode(input:Codec):ByteArray
 		{
 			return null;
+		}
+		
+		public function streamEncode(bytes:ByteArray):ByteArray
+		{
+			parseMediaSegment(bytes);
+			return null;
+		}
+		
+		private function parseMediaSegment(uint8arr):Array
+		{
+			var br:ByteArray = uint8arr;
+			var packets:Array = [];
+			
+			while (br.bytesAvailable > 0) {
+				var tagType:int = byte_r8(br);
+				var dataSize:int = byte_rb24(br);
+				var dts:int = byte_rb24(br);
+				br.position += 4;
+				var data:ByteArray = new ByteArray();
+				br.readBytes(data, 0, dataSize);
+				
+				switch (tagType) {
+					case FlvCodec.TAG_TYPE_META:
+						data.clear();
+						break;
+					
+					case FlvCodec.TAG_TYPE_VIDEO:
+						packets.push(parseVideoPacket(data, dts));
+						break;
+					
+					case FlvCodec.TAG_TYPE_VIDEO:
+						packets.push(parseAudioPacket(data, dts));
+						break;
+					
+					default:
+//						throw new Error('unknown tag=${tagType}');
+				}
+				br.position += 4;
+			}
+			
+			return packets;
+		}
+		
+		private function parseVideoPacket(uint8arr, dts):Object {
+			var br:ByteArray = uint8arr;
+			var flags:int = byte_r8(br);
+			var frameType:int = (flags>>4)&0xf;
+			var codecId:int = flags&0xf;
+			var pkt:Object = {type:'video', dts:dts/1e3};
+			
+			if (codecId == 7) { // h264
+				var type:int = byte_r8(br);
+				var cts:int = byte_rb24(br);
+				pkt.cts = cts/1e3;
+				pkt.pts = dts+cts;
+				if (type == 0) {
+					// AVCDecoderConfigurationRecord
+					var data:ByteArray = new ByteArray();
+					br.readBytes(data);
+					pkt.AVCDecoderConfigurationRecord = data;
+				} else if (type == 1) {
+					// NALUs
+					data = new ByteArray();
+					br.readBytes(data);
+					pkt.NALUs = data;
+					pkt.isKeyFrame = frameType==1;
+				} else if (type == 2) {
+					//throw new Error('type=2');
+				}
+			}
+			return pkt;
+		}
+		
+		private function parseAudioPacket(uint8arr, dts):Object{
+			var br:ByteArray = uint8arr;
+			var flags:int = byte_r8(br);
+			var fmt:int = flags>>4;
+			var pkt = {type: 'audio', dts:dts/1e3}
+			if (fmt == 10) {
+				// AAC
+				var type = byte_r8(br);
+				if (type == 0) {
+					var data:ByteArray = new ByteArray();
+					br.readBytes(data);
+					pkt.AudioSpecificConfig = data;
+					pkt.sampleRate = [5500,11000,22000,44000][(flags>>2)&3];
+					pkt.sampleSize = [8,16][(flags>>1)&1];
+					pkt.channelCount = [1,2][(flags)&1];
+				} else if (type == 1)
+					br.readBytes(data);
+					pkt.frame = data;
+			}
+			return pkt;
+		};
+		
+		private function byte_header(bytes:ByteArray):void
+		{
+			//ftyp box
+			bytes.writeByte(0);
+			bytes.writeByte(0);
+			bytes.writeByte(0);
+			bytes.writeByte(0x20);
+			bytes.writeByte(0x66);
+			bytes.writeByte(0x74);
+			bytes.writeByte(0x79);
+			bytes.writeByte(0x70);
+			
+			//moov
+//			bytes.writeInt(size);
+			bytes.writeInt(Mp4.BOX_TYPE_MOOV);
+			
+			bytes.writeInt(0x6D766864);
+			bytes.writeByte(0x20);
+			bytes.writeByte(0x66);
+			bytes.writeByte(0x74);
+			bytes.writeByte(0x79);
+			bytes.writeByte(0x70);
 		}
 
 		/**

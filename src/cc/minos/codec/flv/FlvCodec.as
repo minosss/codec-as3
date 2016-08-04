@@ -156,7 +156,7 @@ package cc.minos.codec.flv {
 
 			byte_string(header, 'metadatacreator');
 			byte_w8(header, AMF_DATA_TYPE_STRING);
-			byte_string(header, 'codec-as3 by SiuzukZan<minoscc@gmail.com>');
+			byte_string(header, 'codec-as3');
 
 			if (input.hasAudio)
 			{
@@ -188,11 +188,14 @@ package cc.minos.codec.flv {
 
 					byte_string(header, 'hasKeyframes');
 					byte_boolean(header, _hasKey);
+					
+					metadataCount += 1;
 
 					var _len:uint = input.keyframes.length;
 					byte_string(header, 'keyframes');
 					byte_w8(header, AMF_DATA_TYPE_OBJECT);
-
+					
+					
 					byte_string(header, 'filepositions');
 					byte_w8(header, AMF_DATA_TYPE_ARRAY);
 					byte_wb32(header, _len); //count

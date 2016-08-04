@@ -44,23 +44,25 @@ package cc.minos.codec.mp4.boxs {
 			for each(var sample:Sample in _stblBox.samples)
 			{
 				sample.timestamp = toMillisecond(sample.timestamp);
-				if(sample.dataType == FlvCodec.TAG_TYPE_VIDEO)		//仅对视频帧做偏移
+				if(_edtsBox)
 				{
-					if(sample.size > 49)
+					if(sample.dataType == FlvCodec.TAG_TYPE_VIDEO)		//仅对视频帧做偏移
 					{
-						index ++;
-					}
-					if(index == 1 && index != 0)		//第一个内容正常关键帧  第一个为特殊关键帧  忽略
-					{
-						offTime = sample.timestamp - _edtsBox.timeStart;
-						sample.timestamp = _edtsBox.timeStart;
-					}
-					else
-					{
-						sample.timestamp -= offTime;
+						if(sample.size > 49)
+						{
+							index ++;
+						}
+						if(index == 1 && index != 0)		//第一个内容正常关键帧  第一个为特殊关键帧  忽略
+						{
+							offTime = sample.timestamp - _edtsBox.timeStart;
+							sample.timestamp = _edtsBox.timeStart;
+						}
+						else
+						{
+							sample.timestamp -= offTime;
+						}
 					}
 				}
-				
 			}
 		}
 
