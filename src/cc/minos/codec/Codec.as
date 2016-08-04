@@ -5,8 +5,9 @@
  */
 package cc.minos.codec {
 
-	import cc.minos.codec.flv.Frame;
 	import flash.utils.ByteArray;
+	
+	import cc.minos.codec.flv.Frame;
 
 	public class Codec extends Object {
 
@@ -17,7 +18,7 @@ package cc.minos.codec {
 		//格式
 		protected var _mimeType:String;
 		//源數據
-		protected var _rawData:ByteArray = null;
+		protected var _rawData:ByteArray = new ByteArray;
 
 		//幀列表，包括視頻音頻
 		protected var _frames:Vector.<Frame> = new Vector.<Frame>();
@@ -57,7 +58,7 @@ package cc.minos.codec {
 		protected function byte_r8(s:*):int
 		{
 			if (s.position < s.length)
-				return s.readByte();
+				return s.readUnsignedByte();
 			return 0;
 		}
 
@@ -126,8 +127,14 @@ package cc.minos.codec {
 		public function getDataByFrame(frame:Frame):ByteArray
 		{
 			var b:ByteArray = new ByteArray();
-			b.writeBytes(_rawData, frame.offset, frame.size);
-			return b;
+			if(_rawData.length >= frame.offset + frame.size)
+			{
+				b.writeBytes(_rawData, frame.offset, frame.size);
+//				trace(this,_rawData.bytesAvailable, _rawData.position, _rawData.length);
+				return b;
+			}
+//			trace(this,_rawData.bytesAvailable, _rawData.position);
+			return null;
 		}
 
 		public function export():ByteArray

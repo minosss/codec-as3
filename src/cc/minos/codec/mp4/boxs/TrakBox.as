@@ -5,8 +5,9 @@
  */
 package cc.minos.codec.mp4.boxs {
 
-	import cc.minos.codec.mp4.Sample;
+	import cc.minos.codec.flv.FlvCodec;
 	import cc.minos.codec.mp4.Mp4;
+	import cc.minos.codec.mp4.Sample;
 
 	/**
 	 * container
@@ -21,6 +22,7 @@ package cc.minos.codec.mp4.boxs {
 		//tkhd box
 		private var _tkhdBox:TkhdBox;
 		private var _framerate:Number;
+		private var _edtsBox:EdtsBox;
 
 		public function TrakBox()
 		{
@@ -34,12 +36,33 @@ package cc.minos.codec.mp4.boxs {
 			_mdhdBox = getBox(Mp4.BOX_TYPE_MDHD).shift() as MdhdBox;
 			_tkhdBox = getBox(Mp4.BOX_TYPE_TKHD).shift() as TkhdBox;
 			_stblBox = getBox(Mp4.BOX_TYPE_STBL).shift() as StblBox;
+			_edtsBox = getBox(Mp4.BOX_TYPE_EDTS).shift() as EdtsBox;
 
 			_framerate = parseFloat(( _stblBox.samples.length / ( _mdhdBox.duration / _mdhdBox.timeScale )).toFixed(2));
-
+			var index:int = 0;
+			var offTime:Number = 0;
 			for each(var sample:Sample in _stblBox.samples)
 			{
 				sample.timestamp = toMillisecond(sample.timestamp);
+				if(_edtsBox)
+				{
+					if(sample.dataType == FlvCodec.TAG_TYPE_VIDEO)		//仅对视频帧做偏移
+					{
+						if(sample.size > 49)
+						{
+							index ++;
+						}
+						if(index == 1 && index != 0)		//第一个内容正常关键帧  第一个为特殊关键帧  忽略
+						{
+							offTime = sample.timestamp - _edtsBox.timeStart;
+							sample.timestamp = _edtsBox.timeStart;
+						}
+						else
+						{
+							sample.timestamp -= offTime;
+						}
+					}
+				}
 			}
 		}
 
